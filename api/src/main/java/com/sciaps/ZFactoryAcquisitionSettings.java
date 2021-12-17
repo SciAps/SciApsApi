@@ -1,6 +1,6 @@
 package com.sciaps;
 
-public class FactoryAcquisitionSettings {
+public class ZFactoryAcquisitionSettings {
     public int numLocations;                // Number of raster locations
     public int numDataPulses;               // Number of data pulses per location
     public int numCleaningPulses;           // Number of cleaning pulses per location
