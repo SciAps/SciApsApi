@@ -294,4 +294,16 @@ public class SciApsClient {
         }
         return retval;
     }
+
+    public void abort() {
+        HttpPost request = new HttpPost(getUrlForEndpoint("abort"));
+
+        try (CloseableHttpResponse response = mHttpClient.execute(request)) {
+            int status = response.getStatusLine().getStatusCode();
+            Main.LOGGER.info("abort completed with status: {}", status);
+        } catch (Exception e) {
+            e.printStackTrace();
+            Main.LOGGER.error("abort failed", e);
+        }
+    }
 }

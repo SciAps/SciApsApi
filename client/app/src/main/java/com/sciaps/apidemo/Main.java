@@ -23,16 +23,32 @@ public class Main {
 
     public static Logger LOGGER = LoggerFactory.getLogger("ApiDemo");
 
-    public static void main(String[] args) {
+    private static final String DEFAULT_IP_ADDRESS = "192.168.42.129:8080";
 
-        boolean isUsingCommandLine = args.length >= 2;
-        String ipAddress = isUsingCommandLine ? args[0] : JOptionPane.showInputDialog("Enter Analyzer IP Address", "192.168.42.129:8080");
+    public static void main(String[] args) {
+        String defaultAddress = args.length >= 1 ? args[0] : DEFAULT_IP_ADDRESS;
+        String command = args.length >= 2 ? args[1] : "";
+
+        boolean isAbort = command.equalsIgnoreCase("--abort");
+        boolean promptUser = !isAbort && !command.equalsIgnoreCase("--go");
+
+        String ipAddress = defaultAddress;
+        if (promptUser) {
+            ipAddress = JOptionPane.showInputDialog("Enter Analyzer IP Address", ipAddress);
+        }
+
         if (ipAddress == null || ipAddress.trim().isEmpty()) {
             LOGGER.error("Must specify Analyzer IP Address");
             return;
         }
 
         SciApsClient client = new SciApsClient(ipAddress);
+        if (isAbort) {
+            LOGGER.info("Aborting command");
+            client.abort();
+            return;
+        }
+
         InstrumentId id = client.getInstrumentId();
         LOGGER.info("Found {} instrument {} at {}", id.family, id.id, ipAddress);
         LOGGER.info("Model number: {}", id.model);
