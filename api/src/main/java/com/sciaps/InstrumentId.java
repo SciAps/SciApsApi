@@ -10,4 +10,5 @@ public class InstrumentId {
     public String swVersion;                // Software version number
     public String homeVersion;              // Home app version number
     public List<String> apps;               // Available application modes
+    public List<AnalyticalModel> models;    // Available analytical models
 }
