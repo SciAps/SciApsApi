@@ -8,4 +8,6 @@ public class XBeamSettings {
     public double setCountRate;
     public double lowCountRate;
     public double maxCountRate;
+    public double beamTimeMs;
+    public boolean enabled;
 }
