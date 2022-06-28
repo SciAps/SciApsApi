@@ -2,6 +2,7 @@ package com.sciaps;
 
 public class XSpectrum {
    public int index;                         // spectrum index
+   public String beamName;                   // Beam name
    public double energySlope;                // Energy calibration slope
    public double energyOffset;               // Energy calibration offset
    public double liveTime;                   // livetime
