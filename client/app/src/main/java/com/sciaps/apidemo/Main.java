@@ -2,13 +2,22 @@ package com.sciaps.apidemo;
 
 import javax.swing.*;
 
+import com.sciaps.AnalysisResult;
+import com.sciaps.ChemInfo;
 import com.sciaps.InstrumentId;
+import com.sciaps.XAcquisitionResult;
+import com.sciaps.XAcquisitionSettings;
+import com.sciaps.XBeamSettings;
+import com.sciaps.XCalibration;
+import com.sciaps.XFactoryAcquisitionSettings;
+import com.sciaps.XInstrumentConfig;
+import com.sciaps.XInstrumentStatus;
+import com.sciaps.XSpectrum;
+import com.sciaps.XTestResult;
 import com.sciaps.ZAcquisitionMetadata;
 import com.sciaps.ZAcquisitionResult;
 import com.sciaps.ZAcquisitionSettings;
-import com.sciaps.ZAnalysisResult;
 import com.sciaps.ZCalibration;
-import com.sciaps.ZChemInfo;
 import com.sciaps.ZFactoryAcquisitionSettings;
 import com.sciaps.ZInstrumentConfig;
 import com.sciaps.ZInstrumentStatus;
@@ -18,6 +27,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 public class Main {
 
@@ -55,47 +65,138 @@ public class Main {
         LOGGER.info("Part number: {}", id.partNumber);
         LOGGER.info("software version: {}", id.swVersion);
         LOGGER.info("home version: {}", id.homeVersion);
+        LOGGER.info("service version: {}", id.serviceVersion);
+        LOGGER.info("PIC version: {}", id.picVersion);
+        LOGGER.info("OS version: {}", id.osVersion);
         LOGGER.info("Available apps: {}", id.apps);
 
-        ZInstrumentConfig config = client.getZInstrumentConfig();
-        LOGGER.info("Installed spectrometers: {}", config.spectrometers);
-        LOGGER.info("isArgonCapable: {}", config.isArgonCapable);
-        LOGGER.info("isAirPumpCapable: {}", config.isAirPumpCapable);
-        int numSpectrometers = config.spectrometers.size();
+        boolean isXDevice = id.family.equalsIgnoreCase("XRF");
+        if (isXDevice) {
+            XInstrumentConfig config = client.getXInstrumentConfig();
+            LOGGER.info("Detector Type: {}", config.detectorType);
+            LOGGER.info("Tube Type: {}", config.tubeType);
+            LOGGER.info("DPP Firmware: {}", config.dppVersion);
+            LOGGER.info("Shutter Installed: {}", config.isShutterInstalled);
+            LOGGER.info("Filter Wheel Installed: {}", config.isFilterWheelInstalled);
 
-        ZInstrumentStatus status = client.getZInstrumentStatus();
-        LOGGER.info("Battery level: {}%, is charging: {}", status.batteryLevel, status.isCharging);
-        LOGGER.info("Wifi SSID: {}, signal level: {}", status.wifiSSID, status.wifiLevel);
-        LOGGER.info("Location: {}, {}", status.latitude, status.longitude);
-        LOGGER.info("Wl Calibration needed: {}", status.isWlCalNeeded);
-        LOGGER.info("Argon pressure: {} psi", status.argonPSI);
-        LOGGER.info("Laser temp: {} degC", status.laserTemp);
-        LOGGER.info("Processor temp: {} degC", status.processorTemp);
+            XInstrumentStatus status = client.getXInstrumentStatus();
+            LOGGER.info("Battery level: {}%, is charging: {}", status.batteryLevel, status.isCharging);
+            LOGGER.info("Wifi SSID: {}, signal level: {}", status.wifiSSID, status.wifiLevel);
+            LOGGER.info("Location: {}, {}", status.latitude, status.longitude);
+            LOGGER.info("Energy Calibration needed: {}", status.isECalNeeded);
+            LOGGER.info("Detector temp: {} degC", status.detectorTemp);
+            LOGGER.info("Tube temp: {} degC", status.tubeTemp);
 
-        LOGGER.info(" -- Running WL Calibration -- ");
-        client.runWlCalibration();
-        ZCalibration calibration = client.getZCalibration();
-        for (int i = 0; i < numSpectrometers; i++) {
-            LOGGER.info("Calibration coefficients for spectrometer {}: {}", i, Arrays.toString(calibration.coefficients[i]));
+            if (status.isECalNeeded) {
+                LOGGER.info(" -- Running Energy Calibration -- ");
+                client.runEnergyCalibration();
+            }
+            XCalibration calibration = client.getXCalibration();
+            LOGGER.info("Energy calibration slope: {}, offset: {}", calibration.slope, calibration.offset);
+
+            String mode = id.apps.get(0);
+            XAcquisitionSettings userSettings = client.getXAcquisitionSettings(mode);
+            LOGGER.info(" -- UserSettings -- for {}", mode);
+            LOGGER.info("testType: {}, enabledBeams: {}, beamTimes: {}",
+                    userSettings.testType, userSettings.beamEnabledFlags, userSettings.beamTimes);
+
+            userSettings.testType = 4;  // Two Beam Test
+            client.setXAcquisitionSettings(mode, userSettings);
+
+            LOGGER.info(" -- Running {} Test -- ", mode);
+            XTestResult testResult = client.runXTest(mode, userSettings, true);
+            LOGGER.info("Test completed, status: {}, errorCode: {}, abortedByUser: {}",
+                    testResult.status, testResult.errorCode, testResult.abortedByUser);
+            printTestResult(testResult.testData);
+            printXSpectra(testResult.spectra);
+
+            XFactoryAcquisitionSettings factorySettings = client.getXFactoryAcquisitionSettings(mode);
+            LOGGER.info(" -- FactorySettings -- ");
+            LOGGER.info("testType: {}", factorySettings.testType);
+            for (XBeamSettings beam : factorySettings.beams) {
+                LOGGER.info("Beam name: {}, time: {}ms voltage: {}keV, current: {}uA, filterPosition: {}, rates(set/low/max): {}/{}/{}",
+                        beam.name, beam.beamTimeMs, beam.voltage, beam.current, beam.filterPosition,
+                        beam.setCountRate, beam.lowCountRate, beam.maxCountRate);
+            }
+
+            factorySettings.beams.get(0).beamTimeMs = 3000;
+            factorySettings.beams.get(1).beamTimeMs = 6000;
+            factorySettings.beams.get(2).beamTimeMs = 6000;
+            client.setXFactoryAcquisitionSettings(mode, factorySettings);
+
+            XAcquisitionResult acqResult = client.runXAcquisition(mode, factorySettings, true);
+            LOGGER.info("Acquisition completed, status: {}, errorCode: {}, abortedByUser: {}",
+                    acqResult.status, acqResult.errorCode, acqResult.abortedByUser);
+            printXSpectra(acqResult.spectra);
+        } else {
+            ZInstrumentConfig config = client.getZInstrumentConfig();
+            LOGGER.info("Installed spectrometers: {}", config.spectrometers);
+            LOGGER.info("isArgonCapable: {}", config.isArgonCapable);
+            LOGGER.info("isAirPumpCapable: {}", config.isAirPumpCapable);
+            int numSpectrometers = config.spectrometers.size();
+
+            ZInstrumentStatus status = client.getZInstrumentStatus();
+            LOGGER.info("Battery level: {}%, is charging: {}", status.batteryLevel, status.isCharging);
+            LOGGER.info("Wifi SSID: {}, signal level: {}", status.wifiSSID, status.wifiLevel);
+            LOGGER.info("Location: {}, {}", status.latitude, status.longitude);
+            LOGGER.info("Wl Calibration needed: {}", status.isWlCalNeeded);
+            LOGGER.info("Argon pressure: {} psi", status.argonPSI);
+            LOGGER.info("Laser temp: {} degC", status.laserTemp);
+            LOGGER.info("Processor temp: {} degC", status.processorTemp);
+
+            if (status.isWlCalNeeded) {
+                LOGGER.info(" -- Running WL Calibration -- ");
+                client.runWlCalibration();
+            }
+            ZCalibration calibration = client.getZCalibration();
+            for (int i = 0; i < numSpectrometers; i++) {
+                LOGGER.info("Calibration coefficients for spectrometer {}: {}", i, Arrays.toString(calibration.coefficients[i]));
+            }
+
+            String mode = id.apps.get(0);
+            ZAcquisitionSettings userSettings = client.getZAcquisitionSettings(mode);
+            LOGGER.info(" -- UserSettings -- for {}", mode);
+            LOGGER.info("preBurnType: {}, numPreBurnPulses: {}", userSettings.preBurnType, userSettings.numPreBurnPulses);
+
+            userSettings.preBurnType = 0;
+            client.setZAcquisitionSettings(mode, userSettings);
+
+            LOGGER.info(" -- Running {} Test -- ", mode);
+            ZTestResult testResult = client.runZTest(mode, userSettings, true);
+            LOGGER.info("Test completed, status: {}, errorCode: {}, abortedByUser: {}",
+                    testResult.status, testResult.errorCode, testResult.abortedByUser);
+            ZAcquisitionMetadata testMd = testResult.metadata;
+            LOGGER.info("argonEnabled: {}, argonPSI: {}, maxLaserTemp: {}, maxLaserPumpTime: {}, errorMsg: {}",
+                    testMd.argonEnabled, testMd.argonPSI, testMd.maxLaserTemp, testMd.maxLaserPumpTime, testMd.errorMsg);
+            LOGGER.info("Num spectra collected: {}", testResult.spectra.size());
+            printTestResult(testResult.testData);
+
+            ZFactoryAcquisitionSettings factorySettings = client.getZFactoryAcquisitionSettings(mode);
+            LOGGER.info(" -- FactorySettings -- ");
+            LOGGER.info("numLocations: {}, numDataPulses: {}, numCleaningPulses: {}",
+                    factorySettings.numLocations, factorySettings.numDataPulses, factorySettings.numCleaningPulses);
+            LOGGER.info("argonEnabled: {}, preFlushTimeMs: {}, lowArgonWarningEnabled: {}, lowPressureThreshold: {}",
+                    factorySettings.argonEnabled, factorySettings.preFlushTimeMs,
+                    factorySettings.lowArgonWarningEnabled, factorySettings.lowPressureThreshold);
+            LOGGER.info("detectorGatingEnabled: {}, integrationDelay: {}, integrationPeriod: {}",
+                    factorySettings.detectorGatingEnabled, factorySettings.integrationDelay, factorySettings.integrationPeriod);
+            LOGGER.info("laserPulsePeriod: {}, numPulsesToAvg: {}", factorySettings.laserPulsePeriod, factorySettings.numPulsesToAvg);
+            LOGGER.info("preBurnType: {}, numPreBurnPulses: {}", factorySettings.preBurnType, factorySettings.numPreBurnPulses);
+
+            factorySettings.numDataPulses = 32;
+            client.setZFactoryAcquisitionSettings(mode, factorySettings);
+
+            ZAcquisitionResult acqResult = client.runZAcquisition(mode, factorySettings, true);
+            LOGGER.info("Acquisition completed, status: {}, errorCode: {}, abortedByUser: {}",
+                    acqResult.status, acqResult.errorCode, acqResult.abortedByUser);
+            ZAcquisitionMetadata acqMd = acqResult.metadata;
+            LOGGER.info("argonEnabled: {}, argonPSI: {}, maxLaserTemp: {}, maxLaserPumpTime: {}, errorMsg: {}",
+                    acqMd.argonEnabled, acqMd.argonPSI, acqMd.maxLaserTemp, acqMd.maxLaserPumpTime, acqMd.errorMsg);
+            LOGGER.info("Num spectra collected: {}", acqResult.spectra.size());
         }
+    }
 
-        String mode = id.apps.get(0);
-        ZAcquisitionSettings userSettings = client.getZAcquisitionSettings(mode);
-        LOGGER.info(" -- UserSettings -- ");
-        LOGGER.info("preBurnType: {}, numPreBurnPulses: {}", userSettings.preBurnType, userSettings.numPreBurnPulses);
-
-        userSettings.preBurnType = 0;
-        client.setZAcquisitionSettings(mode, userSettings);
-
-        LOGGER.info(" -- Running {} Test -- ", mode);
-        ZTestResult testResult = client.runTest(mode, userSettings, true);
-        LOGGER.info("Test completed, status: {}, errorCode: {}, abortedByUser: {}",
-                testResult.status, testResult.errorCode, testResult.abortedByUser);
-        ZAcquisitionMetadata testMd = testResult.metadata;
-        LOGGER.info("argonEnabled: {}, argonPSI: {}, maxLaserTemp: {}, maxLaserPumpTime: {}, errorMsg: {}",
-                testMd.argonEnabled, testMd.argonPSI, testMd.maxLaserTemp, testMd.maxLaserPumpTime, testMd.errorMsg);
-        LOGGER.info("Num spectra collected: {}", testResult.spectra.size());
-        ZAnalysisResult analysisResult = testResult.testData;
+    static void printTestResult(AnalysisResult analysisResult) {
         LOGGER.info("Mode: {}, timestamp: {}, duration: {}ms", analysisResult.mode,
                 new Date(analysisResult.timestamp), analysisResult.durationMs);
         LOGGER.info("Location: {}, {}", analysisResult.latitude, analysisResult.longitude);
@@ -106,31 +207,16 @@ public class Main {
                 analysisResult.secondGradeMatch, analysisResult.secondGradeMatchScore,
                 analysisResult.thirdGradeMatch, analysisResult.thirdGradeMatchScore);
         LOGGER.info("Chemistry: {} Elements found", analysisResult.chemistry.size());
-        for (ZChemInfo chemInfo : analysisResult.chemistry) {
+        for (ChemInfo chemInfo : analysisResult.chemistry) {
             LOGGER.info("    {} {} +/- {}", chemInfo.atomicNumber, chemInfo.percent, chemInfo.uncertainty);
         }
+    }
 
-        ZFactoryAcquisitionSettings factorySettings = client.getZFactoryAcquisitionSettings(mode);
-        LOGGER.info(" -- FactorySettings -- ");
-        LOGGER.info("numLocations: {}, numDataPulses: {}, numCleaningPulses: {}",
-                factorySettings.numLocations, factorySettings.numDataPulses, factorySettings.numCleaningPulses);
-        LOGGER.info("argonEnabled: {}, preFlushTimeMs: {}, lowArgonWarningEnabled: {}, lowPressureThreshold: {}",
-                factorySettings.argonEnabled, factorySettings.preFlushTimeMs,
-                factorySettings.lowArgonWarningEnabled, factorySettings.lowPressureThreshold);
-        LOGGER.info("detectorGatingEnabled: {}, integrationDelay: {}, integrationPeriod: {}",
-                factorySettings.detectorGatingEnabled, factorySettings.integrationDelay, factorySettings.integrationPeriod);
-        LOGGER.info("laserPulsePeriod: {}, numPulsesToAvg: {}", factorySettings.laserPulsePeriod, factorySettings.numPulsesToAvg);
-        LOGGER.info("preBurnType: {}, numPreBurnPulses: {}", factorySettings.preBurnType, factorySettings.numPreBurnPulses);
-
-        factorySettings.numDataPulses = 32;
-        client.setZFactoryAcquisitionSettings(mode, factorySettings);
-
-        ZAcquisitionResult acqResult = client.runAcquisition(mode, factorySettings, true);
-        LOGGER.info("Acquisition completed, status: {}, errorCode: {}, abortedByUser: {}",
-                acqResult.status, acqResult.errorCode, acqResult.abortedByUser);
-        ZAcquisitionMetadata acqMd = acqResult.metadata;
-        LOGGER.info("argonEnabled: {}, argonPSI: {}, maxLaserTemp: {}, maxLaserPumpTime: {}, errorMsg: {}",
-                acqMd.argonEnabled, acqMd.argonPSI, acqMd.maxLaserTemp, acqMd.maxLaserPumpTime, acqMd.errorMsg);
-        LOGGER.info("Num spectra collected: {}", acqResult.spectra.size());
+    static void printXSpectra(List<XSpectrum> spectra) {
+        LOGGER.info("Num spectra collected: {}", spectra.size());
+        for (XSpectrum s : spectra) {
+            LOGGER.info("index: {}, beam Name: {}, {}keV/{}uA, filter: {}, livetime: {} realtime: {}",
+                    s.index, s.beamName, s.keV, s.uA, s.filterPos, s.liveTime, s.realTime);
+        }
     }
 }
