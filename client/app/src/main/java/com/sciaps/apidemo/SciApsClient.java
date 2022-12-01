@@ -62,7 +62,7 @@ public class SciApsClient {
                 .build();
     }
 
-    private String getUrlForEndpointWithArgs(final String endpoint, final String mode, final String spectra) {
+    private String getUrlForEndpointWithArgs(final String endpoint, final String mode, final String modelName, final String spectra) {
         String url = String.format("http://%s/api/v2/%s", mInetSocketAddress.getHostString(), endpoint);
         if (spectra != null) {
             url += "/" + spectra;
@@ -70,19 +70,26 @@ public class SciApsClient {
         if (mode != null) {
             url += "?mode=" + mode;
         }
+        if (modelName != null) {
+            url += "&modelName=" + modelName;
+        }
         return url;
     }
 
     private String getUrlForEndpoint(final String endpoint) {
-        return getUrlForEndpointWithArgs(endpoint, null, null);
+        return getUrlForEndpointWithArgs(endpoint, null, null, null);
     }
 
-    private String getUrlForEndpointWithMode(final String endpoint, final String mode) {
-        return getUrlForEndpointWithArgs(endpoint, mode, null);
+    private String getUrlForEndpoint(final String endpoint, final String mode) {
+        return getUrlForEndpointWithArgs(endpoint, mode, null, null);
     }
 
-    private String getUrlForEndpointWithModeAndSpecta(final String endpoint, final String mode, boolean allSpectra) {
-        return getUrlForEndpointWithArgs(endpoint, mode, allSpectra ? "all" : "final");
+    private String getUrlForEndpoint(final String endpoint, final String mode, boolean allSpectra) {
+        return getUrlForEndpointWithArgs(endpoint, mode, null, allSpectra ? "all" : "final");
+    }
+
+    private String getUrlForEndpoint(final String endpoint, final String mode, final String modelName, boolean allSpectra) {
+        return getUrlForEndpointWithArgs(endpoint, mode, modelName, allSpectra ? "all" : "final");
     }
 
     public InstrumentId getInstrumentId() {
@@ -178,7 +185,7 @@ public class SciApsClient {
 
     public ZAcquisitionSettings getZAcquisitionSettings(final String mode) {
         ZAcquisitionSettings retval = null;
-        HttpGet request = new HttpGet(getUrlForEndpointWithMode("acquisitionParams/user", mode));
+        HttpGet request = new HttpGet(getUrlForEndpoint("acquisitionParams/user", mode));
         try (CloseableHttpResponse response = mHttpClient.execute(request)) {
             int status = response.getStatusLine().getStatusCode();
             if (status == HttpStatus.SC_OK) {
@@ -199,7 +206,7 @@ public class SciApsClient {
     }
 
     public void setZAcquisitionSettings(final String mode, ZAcquisitionSettings settings) {
-        HttpPut request = new HttpPut(getUrlForEndpointWithMode("acquisitionParams/user", mode));
+        HttpPut request = new HttpPut(getUrlForEndpoint("acquisitionParams/user", mode));
 
         String jsonStr = mGson.toJson(settings);
         StringEntity entity = new StringEntity(jsonStr, ContentType.APPLICATION_JSON);
@@ -216,7 +223,7 @@ public class SciApsClient {
 
     public ZTestResult runZTest(final String mode, ZAcquisitionSettings settings, boolean allSpectra) {
         ZTestResult retval = null;
-        HttpPost request = new HttpPost(getUrlForEndpointWithModeAndSpecta("test", mode, allSpectra));
+        HttpPost request = new HttpPost(getUrlForEndpoint("test", mode, allSpectra));
         String jsonStr = mGson.toJson(settings);
         StringEntity reqEntity = new StringEntity(jsonStr, ContentType.APPLICATION_JSON);
         request.setEntity(reqEntity);
@@ -241,7 +248,7 @@ public class SciApsClient {
 
     public ZFactoryAcquisitionSettings getZFactoryAcquisitionSettings(final String mode) {
         ZFactoryAcquisitionSettings retval = null;
-        HttpGet request = new HttpGet(getUrlForEndpointWithMode("acquisitionParams/factory", mode));
+        HttpGet request = new HttpGet(getUrlForEndpoint("acquisitionParams/factory", mode));
         try (CloseableHttpResponse response = mHttpClient.execute(request)) {
             int status = response.getStatusLine().getStatusCode();
             if (status == HttpStatus.SC_OK) {
@@ -262,7 +269,7 @@ public class SciApsClient {
     }
 
     public void setZFactoryAcquisitionSettings(final String mode, ZFactoryAcquisitionSettings settings) {
-        HttpPut request = new HttpPut(getUrlForEndpointWithMode("acquisitionParams/factory", mode));
+        HttpPut request = new HttpPut(getUrlForEndpoint("acquisitionParams/factory", mode));
 
         String jsonStr = mGson.toJson(settings);
         StringEntity entity = new StringEntity(jsonStr, ContentType.APPLICATION_JSON);
@@ -279,7 +286,7 @@ public class SciApsClient {
 
     public ZAcquisitionResult runZAcquisition(final String mode, ZFactoryAcquisitionSettings settings, boolean allSpectra) {
         ZAcquisitionResult retval = null;
-        HttpPost request = new HttpPost(getUrlForEndpointWithModeAndSpecta("acquire", mode, allSpectra));
+        HttpPost request = new HttpPost(getUrlForEndpoint("acquire", mode, allSpectra));
         String jsonStr = mGson.toJson(settings);
         StringEntity reqEntity = new StringEntity(jsonStr, ContentType.APPLICATION_JSON);
         request.setEntity(reqEntity);
@@ -389,7 +396,7 @@ public class SciApsClient {
 
     public XAcquisitionSettings getXAcquisitionSettings(final String mode) {
         XAcquisitionSettings retval = null;
-        HttpGet request = new HttpGet(getUrlForEndpointWithMode("acquisitionParams/user", mode));
+        HttpGet request = new HttpGet(getUrlForEndpoint("acquisitionParams/user", mode));
         try (CloseableHttpResponse response = mHttpClient.execute(request)) {
             int status = response.getStatusLine().getStatusCode();
             if (status == HttpStatus.SC_OK) {
@@ -410,7 +417,7 @@ public class SciApsClient {
     }
 
     public void setXAcquisitionSettings(final String mode, XAcquisitionSettings settings) {
-        HttpPut request = new HttpPut(getUrlForEndpointWithMode("acquisitionParams/user", mode));
+        HttpPut request = new HttpPut(getUrlForEndpoint("acquisitionParams/user", mode));
 
         String jsonStr = mGson.toJson(settings);
         StringEntity entity = new StringEntity(jsonStr, ContentType.APPLICATION_JSON);
@@ -425,10 +432,10 @@ public class SciApsClient {
         }
     }
 
-    public XTestResult runXTest(final String mode, XAcquisitionSettings settings, boolean allSpectra) {
+    public XTestResult runXTest(final String mode, final String modelName, XAcquisitionSettings settings, boolean allSpectra) {
         XTestResult retval = null;
-        HttpPost request = new HttpPost(getUrlForEndpointWithModeAndSpecta("test", mode, allSpectra));
-        String jsonStr = mGson.toJson(settings);
+        HttpPost request = new HttpPost(getUrlForEndpoint("test", mode, modelName, allSpectra));
+        String jsonStr = settings != null ? mGson.toJson(settings) : "{}";
         StringEntity reqEntity = new StringEntity(jsonStr, ContentType.APPLICATION_JSON);
         request.setEntity(reqEntity);
 
@@ -452,7 +459,7 @@ public class SciApsClient {
 
     public XFactoryAcquisitionSettings getXFactoryAcquisitionSettings(final String mode) {
         XFactoryAcquisitionSettings retval = null;
-        HttpGet request = new HttpGet(getUrlForEndpointWithMode("acquisitionParams/factory", mode));
+        HttpGet request = new HttpGet(getUrlForEndpoint("acquisitionParams/factory", mode));
         try (CloseableHttpResponse response = mHttpClient.execute(request)) {
             int status = response.getStatusLine().getStatusCode();
             if (status == HttpStatus.SC_OK) {
@@ -473,7 +480,7 @@ public class SciApsClient {
     }
 
     public void setXFactoryAcquisitionSettings(final String mode, XFactoryAcquisitionSettings settings) {
-        HttpPut request = new HttpPut(getUrlForEndpointWithMode("acquisitionParams/factory", mode));
+        HttpPut request = new HttpPut(getUrlForEndpoint("acquisitionParams/factory", mode));
 
         String jsonStr = mGson.toJson(settings);
         StringEntity entity = new StringEntity(jsonStr, ContentType.APPLICATION_JSON);
@@ -490,7 +497,7 @@ public class SciApsClient {
 
     public XAcquisitionResult runXAcquisition(final String mode, XFactoryAcquisitionSettings settings, boolean allSpectra) {
         XAcquisitionResult retval = null;
-        HttpPost request = new HttpPost(getUrlForEndpointWithModeAndSpecta("acquire", mode, allSpectra));
+        HttpPost request = new HttpPost(getUrlForEndpoint("acquire", mode, allSpectra));
         String jsonStr = mGson.toJson(settings);
         StringEntity reqEntity = new StringEntity(jsonStr, ContentType.APPLICATION_JSON);
         request.setEntity(reqEntity);
