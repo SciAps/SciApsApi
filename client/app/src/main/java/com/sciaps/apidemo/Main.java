@@ -3,6 +3,7 @@ package com.sciaps.apidemo;
 import javax.swing.*;
 
 import com.sciaps.AnalysisResult;
+import com.sciaps.AnalyticalModel;
 import com.sciaps.ChemInfo;
 import com.sciaps.InstrumentId;
 import com.sciaps.XAcquisitionResult;
@@ -40,9 +41,12 @@ public class Main {
         String command = args.length >= 2 ? args[1] : "";
 
         boolean isAbort = command.equalsIgnoreCase("--abort");
-        boolean promptUser = !isAbort && !command.equalsIgnoreCase("--go");
+        String[] tokens = command.split(":");
+        String mode = tokens.length > 0 ? tokens[0] : null;
+        String modelName = tokens.length > 1 ? tokens[1] : null;
 
         String ipAddress = defaultAddress;
+        boolean promptUser = !isAbort && !(command.equalsIgnoreCase("--go") || mode != null);
         if (promptUser) {
             ipAddress = JOptionPane.showInputDialog("Enter Analyzer IP Address", ipAddress);
         }
@@ -69,6 +73,10 @@ public class Main {
         LOGGER.info("PIC version: {}", id.picVersion);
         LOGGER.info("OS version: {}", id.osVersion);
         LOGGER.info("Available apps: {}", id.apps);
+        LOGGER.info("Available models: ");
+        for (AnalyticalModel model : id.models) {
+            LOGGER.info("  {}:{}", model.mode, model.modelName);
+        }
 
         boolean isXDevice = id.family.equalsIgnoreCase("XRF");
         if (isXDevice) {
@@ -87,6 +95,34 @@ public class Main {
             LOGGER.info("Detector temp: {} degC", status.detectorTemp);
             LOGGER.info("Tube temp: {} degC", status.tubeTemp);
 
+            if (mode != null) {
+                if (modelName != null) {
+                    for (AnalyticalModel model : id.models) {
+                        if (model.mode.equals(mode) && modelName.equals(modelName)) {
+                            LOGGER.info(" -- Running {} Test with model {} -- ", mode, modelName);
+                            XTestResult testResult = client.runXTest(mode, modelName, null, false);
+                            LOGGER.info("Test completed, status: {}, errorCode: {}, abortedByUser: {}",
+                                        testResult.status, testResult.errorCode, testResult.abortedByUser);
+                            printTestResult(testResult.testData);
+                            printXSpectra(testResult.spectra);
+                            return;
+                        }
+                    }
+                } else {
+                    for (String app : id.apps) {
+                        if (app.equals(mode)) {
+                            LOGGER.info(" -- Running {} Test -- ", mode);
+                            XTestResult testResult = client.runXTest(mode, null, null, false);
+                            LOGGER.info("Test completed, status: {}, errorCode: {}, abortedByUser: {}",
+                                        testResult.status, testResult.errorCode, testResult.abortedByUser);
+                            printTestResult(testResult.testData);
+                            printXSpectra(testResult.spectra);
+                            return;
+                        }
+                    }
+                }
+            }
+
             if (status.isECalNeeded) {
                 LOGGER.info(" -- Running Energy Calibration -- ");
                 client.runEnergyCalibration();
@@ -94,7 +130,7 @@ public class Main {
             XCalibration calibration = client.getXCalibration();
             LOGGER.info("Energy calibration slope: {}, offset: {}", calibration.slope, calibration.offset);
 
-            String mode = id.apps.get(0);
+            mode = id.apps.get(0);
             XAcquisitionSettings userSettings = client.getXAcquisitionSettings(mode);
             LOGGER.info(" -- UserSettings -- for {}", mode);
             LOGGER.info("testType: {}, enabledBeams: {}, beamTimes: {}",
@@ -104,7 +140,7 @@ public class Main {
             client.setXAcquisitionSettings(mode, userSettings);
 
             LOGGER.info(" -- Running {} Test -- ", mode);
-            XTestResult testResult = client.runXTest(mode, userSettings, true);
+            XTestResult testResult = client.runXTest(mode, null, userSettings, true);
             LOGGER.info("Test completed, status: {}, errorCode: {}, abortedByUser: {}",
                     testResult.status, testResult.errorCode, testResult.abortedByUser);
             printTestResult(testResult.testData);
@@ -153,7 +189,7 @@ public class Main {
                 LOGGER.info("Calibration coefficients for spectrometer {}: {}", i, Arrays.toString(calibration.coefficients[i]));
             }
 
-            String mode = id.apps.get(0);
+            mode = id.apps.get(0);
             ZAcquisitionSettings userSettings = client.getZAcquisitionSettings(mode);
             LOGGER.info(" -- UserSettings -- for {}", mode);
             LOGGER.info("preBurnType: {}, numPreBurnPulses: {}", userSettings.preBurnType, userSettings.numPreBurnPulses);
