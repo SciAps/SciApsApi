@@ -9,5 +9,9 @@ public class InstrumentId {
     public String partNumber;               // Instrument part number
     public String swVersion;                // Software version number
     public String homeVersion;              // Home app version number
+    public String serviceVersion;           // Analyzer Service version number
+    public String picVersion;               // PIC Firmware version number
+    public String osVersion;                // OS Release version number
     public List<String> apps;               // Available application modes
+    public List<AnalyticalModel> models;    // Available analytical models
 }

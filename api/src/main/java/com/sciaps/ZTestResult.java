@@ -8,5 +8,5 @@ public class ZTestResult {
     public int errorCode;
     public List<ZSpectrum> spectra;
     public ZAcquisitionMetadata metadata;
-    public ZAnalysisResult testData;
+    public AnalysisResult testData;
 }

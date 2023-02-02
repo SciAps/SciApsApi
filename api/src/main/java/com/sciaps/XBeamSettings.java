@@ -5,8 +5,9 @@ public class XBeamSettings {
     public double voltage;              // Voltage in KeV
     public double current;              // Current in uA
     public int filterPosition;          // 0-5 are valid values
-    public double timeMs;               // time in milliseconds
     public double setCountRate;
     public double lowCountRate;
     public double maxCountRate;
+    public double beamTimeMs;
+    public boolean enabled;
 }

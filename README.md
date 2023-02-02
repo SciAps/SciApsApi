@@ -2,22 +2,24 @@
 
 The SciAps Remote Control API allows clients to query and apply acquisition settings, and initiate calibrations, tests and spectrum acquisitions.
 
-| URL | METHOD | BODY | RESPONSE | DESCRIPTION |
-| --- | --- | --- | --- | --- |
-| /api/v2/id | GET | - | InstrumentId | Returns identifying info |
-| /api/v2/config | GET | - | ZInstrumentConfig | Returns configuration info |
-| /api/v2/status | GET | - | ZInstrumentStatus | Returns status info |
-| /api/v2/wlcalibration | GET | - | ZCalibration | Return calibration coefficients |
-| /api/v2/wlcalibration | POST | - | - | Run a wavelength calibration |
-| /api/v2/acquisitionParams/user?mode=[mode] | GET | - | ZAcquisitionSettings | Returns user acquisition settings for the given mode |
-| /api/v2/acquisitionParams/user?mode=[mode] | PUT | ZAcquisitionSettings | - | Applies user acquisition settings for the given mode |
-| /api/v2/acquisitionParams/user?mode=[mode] | POST | - | - | Reset user acquisition settings for the given mode to factory defaults |
-| /api/v2/test/{spectra}?mode=[mode] | POST | ZAcquisitionSettings | ZTestResult | Runs a test using the given user acquisition settings |
-| /api/v2/acquisitionParams/factory?mode=[mode] | GET | - | ZFactoryAcquisitionSettings | Returns factory acquisition settings for the given mode |
-| /api/v2/acquisitionParams/factory?mode=[mode] | PUT | ZFactoryAcquisitionSettings | - | Applies factory acquisition settings for the given mode |
-| /api/v2/acquisitionParams/factory?mode=[mode] | POST | - | - |Reset factory acquisition settings for the given mode to factory defaults |
-| /api/v2/acquire/{spectra}?mode=[mode] | POST | ZFactoryAcquisitionSettings | ZAcquisitionResult | Acquire spectra using the given factory acquisition settings |
-| /api/v2/abort | POST | - | - | Aborts the currently running operation |
+| URL | METHOD | BODY                                         | RESPONSE                                                   | DESCRIPTION                                                               |
+| --- | --- |----------------------------------------------|------------------------------------------------------------|---------------------------------------------------------------------------|
+| /api/v2/id | GET | -                                            | InstrumentId                                               | Returns identifying info                                                  |
+| /api/v2/config | GET | -                                            | ZInstrumentConfig or XInstrumentConfig                     | Returns configuration info                                                |
+| /api/v2/status | GET | -                                            | ZInstrumentStatus or ZInstrumentStatus                     | Returns status info                                                       |
+| /api/v2/wlcalibration | GET | -                                            | ZCalibration                                               | Return calibration coefficients                                           |
+| /api/v2/wlcalibration | POST | -                                            | -                                                          | Run a wavelength calibration                                              |
+| /api/v2/energyCal | GET | -                                            | XCalibration                                               | Return calibration coefficients                                           |
+| /api/v2/energyCal | POST | -                                            | -                                                          | Run a energy calibration                                                  |
+| /api/v2/acquisitionParams/user?mode=[mode] | GET | -                                            | ZAcquisitionSettings or XAcquisitionSettings               | Returns user acquisition settings for the given mode                      |
+| /api/v2/acquisitionParams/user?mode=[mode] | PUT | ZAcquisitionSettings or XAcquisitionSettings | -                                                          | Applies user acquisition settings for the given mode                      |
+| /api/v2/acquisitionParams/user?mode=[mode] | POST | -                                            | -                                                          | Reset user acquisition settings for the given mode to factory defaults    |
+| /api/v2/test/{spectra}?mode=[mode] | POST | ZAcquisitionSettings or XAcquisitionSettings | ZTestResult or XTestResult                                 | Runs a test using the given user acquisition settings                     |
+| /api/v2/acquisitionParams/factory?mode=[mode] | GET | -                                            | ZFactoryAcquisitionSettings or XFactoryAcquisitionSettings | Returns factory acquisition settings for the given mode                   |
+| /api/v2/acquisitionParams/factory?mode=[mode] | PUT | ZFactoryAcquisitionSettings or XFactoryAcquisitionSettings                 | -                                                          | Applies factory acquisition settings for the given mode                   |
+| /api/v2/acquisitionParams/factory?mode=[mode] | POST | -                                            | -                                                          | Reset factory acquisition settings for the given mode to factory defaults |
+| /api/v2/acquire/{spectra}?mode=[mode] | POST | ZFactoryAcquisitionSettings or XFactoryAcquisitionSettings                 | ZAcquisitionResult or XAcquisitionResult                   | Acquire spectra using the given factory acquisition settings              |
+| /api/v2/abort | POST | -                                            | -                                                          | Aborts the currently running operation                                    |
 
 ## Analyzer Information
 These commands return identifying information required for further communications with the analyzer as well as 
@@ -26,18 +28,31 @@ configuration and current status.
 ### /api/v2/id
 Clients should query the **id** endpoint to determine the device family which identifies the analyzer as XRF or LIBS.
 Also, the list of licensed applications id returned, which define the valid values for the mode parameter of the other 
-endpoints.  Details of the InstrumentId object can be found [here](https://github.com/SciAps/SciApsApi/tree/master/api/src/main/java/com/sciaps/InstrumentId.java)
+endpoints.  Details of the InstrumentId object can be found 
+[here](https://github.com/SciAps/SciApsApi/tree/master/api/src/main/java/com/sciaps/InstrumentId.java)
 
-#### Example usage:
+#### Example usage LIBS:
 ```
 $ curl http://192.168.42.129:8080/api/v2/id
 {"apps":["Alloy","Geochem"],"family":"LIBS","homeVersion":"ngl-v1.1-0-gc76429c","id":"Z903-00003","model":"Z-903 Geo","partNumber":"910-500080","swVersion":"ngl-v1.1-1-28-gd5f5857c"}
 ```
 
+#### Example usage XRF:
+```
+$ curl http://192.168.42.129:8080/api/v2/id
+{"apps":["Alloy","Aluminum","Soil","PreciousMetals","Mining","SulfidicCorrosion","X505Alloy","Residuals","Empirical","Ree","Rohs","LeadPaint"],
+"family":"XRF","homeVersion":"ngx-v2.0-1-0-ga8f58d9","id":"X550-00116","model":"X550_Rh","models":[{"mode":"Soil","modelName":"Soil"},
+{"mode":"LeadPaint","modelName":"LeadPaint"},{"mode":"Empirical","modelName":"EmpiricalMassRatio"},
+{"mode":"Empirical","modelName":"AgCoatingOnCu"},{"mode":"Empirical","modelName":"EmpiricalPb"},
+{"mode":"Mining","modelName":"Mining"}],"osVersion":"3.10.49-g449978c","partNumber":"","picVersion":"2.5.0.7",
+"serviceVersion":"ngx-v2.0-2-g1e65dd2","swVersion":"ngx-v2.0-1-17-g5bb8a5aaf-dev"}
+```
+
 ## LIBS Analyzers
 
 ### /api/v2/config
-Details of the ZInstrumentConfig object can be found [here](https://github.com/SciAps/SciApsApi/tree/master/api/src/main/java/com/sciaps/ZInstrumentConfig.java)
+Details of the ZInstrumentConfig object can be found 
+[here](https://github.com/SciAps/SciApsApi/tree/master/api/src/main/java/com/sciaps/ZInstrumentConfig.java)
 
 #### Example usage:
 ```
@@ -46,7 +61,8 @@ $ curl http://192.168.42.129:8080/api/v2/config
 ```
 
 ### /api/v2/status
-Details of the ZInstrumentStatus object can be found [here](https://github.com/SciAps/SciApsApi/tree/master/api/src/main/java/com/sciaps/ZInstrumentStatus.java)
+Details of the ZInstrumentStatus object can be found 
+[here](https://github.com/SciAps/SciApsApi/tree/master/api/src/main/java/com/sciaps/ZInstrumentStatus.java)
 
 #### Example usage:
 ```
@@ -58,7 +74,8 @@ $ curl http://192.168.42.129:8080/api/v2/status
 These commands return the current calibration coefficients and recalculates them.
 
 ### /api/v2/wlcalibration
-Details of the ZCalibration object can be found [here](https://github.com/SciAps/SciApsApi/tree/master/api/src/main/java/com/sciaps/ZCalibration.java)
+Details of the ZCalibration object can be found 
+[here](https://github.com/SciAps/SciApsApi/tree/master/api/src/main/java/com/sciaps/ZCalibration.java)
 
 #### Example usage:
 ```
@@ -134,3 +151,110 @@ This endpoint aborts the currently running command
 ```
 $ curl -X POST http://192.168.42.129:8080/api/v2/abort
 ```
+
+## XRF Analyzers
+
+### /api/v2/config
+Details of the XInstrumentConfig object can be found
+[here](https://github.com/SciAps/SciApsApi/tree/master/api/src/main/java/com/sciaps/XInstrumentConfig.java)
+
+#### Example usage:
+```
+$ curl http://192.168.42.129:8080/api/v2/config
+{"detectorType":"Ketek","dppVersion":"DXP PIC v32.4.14, DSP v12.5.133","isFilterWheelInstalled":true,"isShutterInstalled":false,"tubeType":"Rh"}
+```
+
+### /api/v2/status
+Details of the XInstrumentStatus object can be found 
+[here](https://github.com/SciAps/SciApsApi/tree/master/api/src/main/java/com/sciaps/XInstrumentStatus.java)
+
+#### Example usage:
+```
+$ curl http://192.168.42.129:8080/api/v2/status
+{"batteryLevel":80.0,"detectorTemp":-25.055584,"isCharging":true,"isECalNeeded":false,"latitude":0.0,"longitude":0.0,"tubeTemp":38.280247,"user":"","wifiLevel":0,"wifiSSID":""}
+```
+
+## Energy Calibration
+These commands return the current calibration coefficients and recalculates them.
+
+### /api/v2/energyCal
+Details of the XCalibration object can be found 
+[here](https://github.com/SciAps/SciApsApi/tree/master/api/src/main/java/com/sciaps/XCalibration.java)
+
+#### Example usage:
+```
+$ curl http://192.168.42.129:8080/api/v2/energyCal
+{"offset":-17.460930552816535,"slope":20.038459361730006}
+$ curl -X POST http://192.168.42.129:8080/api/v2/energyCal
+{"status":"CODE_SUCCESS","abortedByUser":"false","errorCode":0}
+```
+
+## Tests
+These commands relate to running tests which return chemistry information for the sample along with spectra.
+
+### /api/v2/acquisitionParams/user
+This endpoint is used to retrieve or apply user acquisition settings.  User acquisition settings are a subset
+of the factory acquisition settings.  This endpoint requires a mode to be passed which can be obtained from the **apps**
+field of the InstrumentId object.  Details of the XAcquisitionSettings object can be found
+[here](https://github.com/SciAps/SciApsApi/tree/master/api/src/main/java/com/sciaps/XAcquisitionSettings.java)
+
+#### Example usage:
+```
+$ curl --output alloy-user-settings.json http://192.168.42.129:8080/api/v2/acquisitionParams/user?mode=Alloy
+$ curl -X PUT -H "Content-Type: application/json" -d @alloy-user-settings.json http://192.168.42.129:8080/api/v2/acquisitionParams/user?mode=Alloy
+$ curl -X PUT -H "Content-Type: application/json" -d '{"testType":4}' http://192.168.42.129:8080/api/v2/acquisitionParams/user?mode=Alloy
+```
+
+### /api/v2/test
+This endpoint is used to initiate a test and return spectra and chemistry results.  Individual spectra will be returned
+if **all** is passed as the last segment of the URL.  Only the final spectra will be returned if **final**
+is passed as the last segment of the URL.  This endpoint requires a mode to be passed which can be obtained from the **apps**
+field of the InstrumentId object.  Details of the XTestResult object can be found
+[here](https://github.com/SciAps/SciApsApi/tree/master/api/src/main/java/com/sciaps/XTestResult.java)
+
+#### Example usage:
+```
+# Perform an Alloy test with default settings
+$ curl -X POST -H "Content-Type: application/json" -d '{}' --output output.json http://192.168.42.129:8080/api/v2/test/all?mode=Alloy
+# Perform an Alloy test with specified settings
+$ curl -X POST -H "Content-Type: application/json" -d @alloy-user-settings.json --output output.json http://192.168.42.129:8080/api/v2/test/final?mode=Alloy
+# Perform an Empirical test with specified model and settings - notice that & must be escaped for the shell
+$ curl -X POST --output empirical-test.json -H "Content-Type: application/json" -d @empirical-user-settings.json http://192.168.42.129:8080/api/v2/test?mode=Empirical\&modelName=AgCoatingOnCu
+```
+
+## Raw Spectra Acquisition
+These commands relate to acquiring spectra only.
+
+### /api/v2/acquisitionParams/factory
+This endpoint is used to retrieve or apply factory acquisition settings.  This endpoint requires a mode to be
+passed which can be obtained from the **apps** field of the InstrumentId object.  Details of the
+XFactoryAcquisitionSettings object can be found
+[here](https://github.com/SciAps/SciApsApi/tree/master/api/src/main/java/com/sciaps/XFactoryAcquisitionSettings.java)
+
+#### Example usage:
+```
+$ curl --output settings.json http://192.168.42.129:8080/api/v2/acquisitionParams/factory?mode=Alloy
+$ curl -X PUT -H "Content-Type: application/json" -d @settings.json http://192.168.42.129:8080/api/v2/acquisitionParams/factory?mode=Alloy
+```
+
+### /api/v2/acquire
+This endpoint is used to initiate raw spectra acquisition.  Individual spectra will be returned if **all** is passed
+as the last segment of the URL.  Only the final spectra will be returned if **final**is passed as the last
+segment of the URL.  This endpoint requires a mode to be passed which can be obtained from the **apps**
+field of the InstrumentId object.  Details of the
+XAcquisitionResult object can be found
+[here](https://github.com/SciAps/SciApsApi/tree/master/api/src/main/java/com/sciaps/XAcquisitionResult.java)
+
+#### Example usage:
+```
+$ curl -X POST -H "Content-Type: application/json" -d @settings.json --output output.json http://192.168.42.129:8080/api/v2/acquire/all?mode=Alloy
+```
+
+### /api/v2/abort
+This endpoint aborts the currently running command
+
+#### Example usage:
+```
+$ curl -X POST http://192.168.42.129:8080/api/v2/abort
+```
+
