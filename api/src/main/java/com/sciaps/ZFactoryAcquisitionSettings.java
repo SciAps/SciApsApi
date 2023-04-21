@@ -15,4 +15,5 @@ public class ZFactoryAcquisitionSettings {
     public int numPulsesToAvg;              // Spectra averaging
     public int preBurnType;                 // 0 = off, 1 = short, 2 = long
     public int numPreBurnPulses;            // Number of pre burn pulses
+    public int rasterPattern;               // 0 = typewriter, 1 = s-pattern
 }
