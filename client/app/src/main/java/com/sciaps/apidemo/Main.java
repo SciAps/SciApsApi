@@ -46,12 +46,12 @@ public class Main {
         String modelName = tokens.length > 1 ? tokens[1] : null;
 
         String ipAddress = defaultAddress;
-        boolean promptUser = !isAbort && !(command.equalsIgnoreCase("--go") || mode != null);
+        boolean promptUser = !isAbort && !(command.equalsIgnoreCase("--go") || !isEmptyString(mode));
         if (promptUser) {
             ipAddress = JOptionPane.showInputDialog("Enter Analyzer IP Address", ipAddress);
         }
 
-        if (ipAddress == null || ipAddress.trim().isEmpty()) {
+        if (isEmptyString(ipAddress)) {
             LOGGER.error("Must specify Analyzer IP Address");
             return;
         }
@@ -95,8 +95,8 @@ public class Main {
             LOGGER.info("Detector temp: {} degC", status.detectorTemp);
             LOGGER.info("Tube temp: {} degC", status.tubeTemp);
 
-            if (mode != null) {
-                if (modelName != null) {
+            if (!isEmptyString(mode)) {
+                if (!isEmptyString(modelName)) {
                     for (AnalyticalModel model : id.models) {
                         if (model.mode.equals(mode) && modelName.equals(modelName)) {
                             LOGGER.info(" -- Running {} Test with model {} -- ", mode, modelName);
@@ -169,7 +169,7 @@ public class Main {
             LOGGER.info("Installed spectrometers: {}", config.spectrometers);
             LOGGER.info("isArgonCapable: {}", config.isArgonCapable);
             LOGGER.info("isAirPumpCapable: {}", config.isAirPumpCapable);
-            int numSpectrometers = config.spectrometers.size();
+            int numSpectrometers = config.spectrometers.length();
 
             ZInstrumentStatus status = client.getZInstrumentStatus();
             LOGGER.info("Battery level: {}%, is charging: {}", status.batteryLevel, status.isCharging);
@@ -189,7 +189,9 @@ public class Main {
                 LOGGER.info("Calibration coefficients for spectrometer {}: {}", i, Arrays.toString(calibration.coefficients[i]));
             }
 
-            mode = id.apps.get(0);
+            if (isEmptyString(mode)) {
+                mode = id.apps.get(0);
+            }
             ZAcquisitionSettings userSettings = client.getZAcquisitionSettings(mode);
             LOGGER.info(" -- UserSettings -- for {}", mode);
             LOGGER.info("preBurnType: {}, numPreBurnPulses: {}", userSettings.preBurnType, userSettings.numPreBurnPulses);
@@ -232,19 +234,25 @@ public class Main {
         }
     }
 
+    public static boolean isEmptyString(String str) {
+        return !(str != null && str.trim().length() > 0);
+    }
+
     static void printTestResult(AnalysisResult analysisResult) {
-        LOGGER.info("Mode: {}, timestamp: {}, duration: {}ms", analysisResult.mode,
-                new Date(analysisResult.timestamp), analysisResult.durationMs);
-        LOGGER.info("Location: {}, {}", analysisResult.latitude, analysisResult.longitude);
-        LOGGER.info("Base: {}, Grade Library: {}, modelName: {}",
-                analysisResult.base, analysisResult.gradeLibraryName, analysisResult.modelName);
-        LOGGER.info("Grade matches: {} ({}), {} ({}), {} ({})",
-                analysisResult.firstGradeMatch, analysisResult.firstGradeMatchScore,
-                analysisResult.secondGradeMatch, analysisResult.secondGradeMatchScore,
-                analysisResult.thirdGradeMatch, analysisResult.thirdGradeMatchScore);
-        LOGGER.info("Chemistry: {} Elements found", analysisResult.chemistry.size());
-        for (ChemInfo chemInfo : analysisResult.chemistry) {
-            LOGGER.info("    {} {} +/- {}", chemInfo.atomicNumber, chemInfo.percent, chemInfo.uncertainty);
+        if (analysisResult != null) {
+            LOGGER.info("Mode: {}, timestamp: {}, duration: {}ms", analysisResult.mode,
+                        new Date(analysisResult.timestamp), analysisResult.durationMs);
+            LOGGER.info("Location: {}, {}", analysisResult.latitude, analysisResult.longitude);
+            LOGGER.info("Base: {}, Grade Library: {}, modelName: {}",
+                        analysisResult.base, analysisResult.gradeLibraryName, analysisResult.modelName);
+            LOGGER.info("Grade matches: {} ({}), {} ({}), {} ({})",
+                        analysisResult.firstGradeMatch, analysisResult.firstGradeMatchScore,
+                        analysisResult.secondGradeMatch, analysisResult.secondGradeMatchScore,
+                        analysisResult.thirdGradeMatch, analysisResult.thirdGradeMatchScore);
+            LOGGER.info("Chemistry: {} Elements found", analysisResult.chemistry.size());
+            for (ChemInfo chemInfo : analysisResult.chemistry) {
+                LOGGER.info("    {} {} +/- {}", chemInfo.atomicNumber, chemInfo.percent, chemInfo.uncertainty);
+            }
         }
     }
 
