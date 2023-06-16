@@ -8,7 +8,7 @@ The SciAps Remote Control API allows clients to query and apply acquisition sett
 | /api/v2/config | GET | -                                            | ZInstrumentConfig or XInstrumentConfig                     | Returns configuration info                                                |
 | /api/v2/status | GET | -                                            | ZInstrumentStatus or ZInstrumentStatus                     | Returns status info                                                       |
 | /api/v2/wlcalibration | GET | -                                            | ZCalibration                                               | Return calibration coefficients                                           |
-| /api/v2/wlcalibration | POST | -                                            | -                                                          | Run a wavelength calibration                                              |
+| /api/v2/wlcalibration?mode=[mode] | POST | -                                            | -                                                          | Run a wavelength calibration                                              |
 | /api/v2/energyCal | GET | -                                            | XCalibration                                               | Return calibration coefficients                                           |
 | /api/v2/energyCal | POST | -                                            | -                                                          | Run a energy calibration                                                  |
 | /api/v2/acquisitionParams/user?mode=[mode] | GET | -                                            | ZAcquisitionSettings or XAcquisitionSettings               | Returns user acquisition settings for the given mode                      |
@@ -81,7 +81,7 @@ Details of the ZCalibration object can be found
 ```
 $ curl http://192.168.42.129:8080/api/v2/wlcalibration
 {"coefficients":[[369.19634957579086,-0.0785188815993957,-5.796697950455971E-6,4.533061070459962E-10],[625.6182269991748,-0.11134386477793423,-9.534416965576989E-6,6.856738216864445E-10],[949.2019021133968,-0.15742079497045272,-1.3855774884084319E-5,9.016855223288858E-10]]}
-$ curl -X POST http://192.168.42.129:8080/api/v2/wlcalibration
+$ curl -X POST http://192.168.42.129:8080/api/v2/wlcalibration?mode=Alloy
 {"status":"CODE_SUCCESS","abortedByUser":"false","errorCode":0}
 ```
 
