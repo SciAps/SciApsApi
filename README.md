@@ -14,7 +14,7 @@ The SciAps Remote Control API allows clients to query and apply acquisition sett
 | /api/v2/acquisitionParams/user?mode=[mode] | GET | -                                            | ZAcquisitionSettings or XAcquisitionSettings               | Returns user acquisition settings for the given mode                      |
 | /api/v2/acquisitionParams/user?mode=[mode] | PUT | ZAcquisitionSettings or XAcquisitionSettings | -                                                          | Applies user acquisition settings for the given mode                      |
 | /api/v2/acquisitionParams/user?mode=[mode] | POST | -                                            | -                                                          | Reset user acquisition settings for the given mode to factory defaults    |
-| /api/v2/test/{spectra}?mode=[mode] | POST | ZAcquisitionSettings or XAcquisitionSettings | ZTestResult or XTestResult                                 | Runs a test using the given user acquisition settings                     |
+| /api/v2/test/{spectra}?mode=[mode]&modelName=[modelName] | POST | ZAcquisitionSettings or XAcquisitionSettings | ZTestResult or XTestResult                                 | Runs a test using the given user acquisition settings                     |
 | /api/v2/acquisitionParams/factory?mode=[mode] | GET | -                                            | ZFactoryAcquisitionSettings or XFactoryAcquisitionSettings | Returns factory acquisition settings for the given mode                   |
 | /api/v2/acquisitionParams/factory?mode=[mode] | PUT | ZFactoryAcquisitionSettings or XFactoryAcquisitionSettings                 | -                                                          | Applies factory acquisition settings for the given mode                   |
 | /api/v2/acquisitionParams/factory?mode=[mode] | POST | -                                            | -                                                          | Reset factory acquisition settings for the given mode to factory defaults |
@@ -34,18 +34,21 @@ endpoints.  Details of the InstrumentId object can be found
 #### Example usage LIBS:
 ```
 $ curl http://192.168.42.129:8080/api/v2/id
-{"apps":["Alloy","Geochem"],"family":"LIBS","homeVersion":"ngl-v1.1-0-gc76429c","id":"Z903-00003","model":"Z-903 Geo","partNumber":"910-500080","swVersion":"ngl-v1.1-1-28-gd5f5857c"}
+{"apps":["Alloy","Geochem"],
+"family":"LIBS","homeVersion":"ngl-v2.0.6-0-g0c6f38b","id":"Z901-00000","model":"Z-901 Dual-Burn",
+"models":[{"mode":"Geochem","modelName":"Lithium-Clay"},{"mode":"Geochem","modelName":"Lithium-Mica-Schist"},{"mode":"Geochem","modelName":"Lithium-Pegmatite"}],
+"osVersion":"3.10.49-gebcaa3c","partNumber":"910-500088","picVersion":"5.0.1.0","serviceVersion":"ngl-v2.0.6-0-g8f20647","swVersion":"ngl-v2.0.6-7-g9c5d66a3"}
 ```
 
 #### Example usage XRF:
 ```
 $ curl http://192.168.42.129:8080/api/v2/id
-{"apps":["Alloy","Aluminum","Soil","PreciousMetals","Mining","SulfidicCorrosion","X505Alloy","Residuals","Empirical","Ree","Rohs","LeadPaint"],
-"family":"XRF","homeVersion":"ngx-v2.0-1-0-ga8f58d9","id":"X550-00116","model":"X550_Rh","models":[{"mode":"Soil","modelName":"Soil"},
-{"mode":"LeadPaint","modelName":"LeadPaint"},{"mode":"Empirical","modelName":"EmpiricalMassRatio"},
-{"mode":"Empirical","modelName":"AgCoatingOnCu"},{"mode":"Empirical","modelName":"EmpiricalPb"},
-{"mode":"Mining","modelName":"Mining"}],"osVersion":"3.10.49-g449978c","partNumber":"","picVersion":"2.5.0.7",
-"serviceVersion":"ngx-v2.0-2-g1e65dd2","swVersion":"ngx-v2.0-1-17-g5bb8a5aaf-dev"}
+{"apps":["Alloy","Aluminum","Soil","PreciousMetals","Mining","SulfidicCorrosion","X505Alloy","Residuals","Empirical","Ree","Rohs","LeadPaint","CarCats","Turnings","Coatings","DetectOre"],
+"family":"XRF","homeVersion":"ngl-v2.0.3-0-gfbcfdd2","id":"X550-00121","model":"X505_Rh","models":[{"mode":"Mining","modelName":"Mining"},{"mode":"Mining","modelName":"MiningAuOriginal"},
+{"mode":"CarCats","modelName":"CarCats"},{"mode":"RohsPolymer","modelName":"RohsPolymer"},{"mode":"LeadPaint","modelName":"LeadPaint"},{"mode":"Empirical","modelName":"Coatings"},
+{"mode":"Empirical","modelName":"EmpiricalAppTest"},{"mode":"Empirical","modelName":"Coatings-Ag"},{"mode":"Empirical","modelName":"Coatings-Au"},{"mode":"Soil","modelName":"Soil"},
+{"mode":"Mining","modelName":"MiningDeriv"},{"mode":"Mining","modelName":"Mining2Deriv"},{"mode":"Mining","modelName":"MiningAuDeriv"}],"osVersion":"3.10.49-g1be460e",
+"partNumber":"","picVersion":"2.6.0.0","serviceVersion":"ngx-v2.1-1-0-gc29a29f","swVersion":"ngx-v2.2.1-2-131-g59406f679"}
 ```
 
 ## LIBS Analyzers
@@ -106,13 +109,14 @@ $ curl -X POST http://192.168.42.129:8080/api/v2/acquisitionParams/user?mode=All
 This endpoint is used to initiate a test and return spectra and chemistry results.  Individual spectra will be returned
 if **all** is passed as the last segment of the URL.  Only the final, averaged spectra will be returned if **final**
 is passed as the last segment of the URL.  This endpoint requires a mode to be passed which can be obtained from the **apps**
-field of the InstrumentId object.  Details of the
-ZTestResult object can be found
+field of the InstrumentId object. Passing a model name works similar to force base on the analyzer and is optional for most application types.
+Details of the ZTestResult object can be found
 [here](https://github.com/SciAps/SciApsApi/tree/master/api/src/main/java/com/sciaps/ZTestResult.java)
 
 #### Example usage:
 ```
 $ curl -X POST -H "Content-Type: application/json" -d '{}' --output output.json http://192.168.42.129:8080/api/v2/test/all?mode=Alloy
+$ curl -X POST -H "Content-Type: application/json" -d '{}' --output output.json http://192.168.42.129:8080/api/v2/test/all?mode=Geochem&modelName=Lithium-Clay
 ```
 
 ## Raw Spectra Acquisition
