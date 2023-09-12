@@ -20,6 +20,7 @@ The SciAps Remote Control API allows clients to query and apply acquisition sett
 | /api/v2/acquisitionParams/factory?mode=[mode] | POST | -                                            | -                                                          | Reset factory acquisition settings for the given mode to factory defaults |
 | /api/v2/acquire/{spectra}?mode=[mode] | POST | ZFactoryAcquisitionSettings or XFactoryAcquisitionSettings                 | ZAcquisitionResult or XAcquisitionResult                   | Acquire spectra using the given factory acquisition settings              |
 | /api/v2/abort | POST | -                                            | -                                                          | Aborts the currently running operation                                    |
+| /api/v2/photo?cameraId=[cameraId] | GET | -                                             | Byte array                                                 | Takes a high resolution image from the specified camera                   |
 
 ## Analyzer Information
 These commands return identifying information required for further communications with the analyzer as well as 
@@ -262,3 +263,11 @@ This endpoint aborts the currently running command
 $ curl -X POST http://192.168.42.129:8080/api/v2/abort
 ```
 
+### /api/v2/photo
+This endpoint is used to get high resolution camera image. The endpoint requires a camera type.
+
+#### Example usage:
+```
+$ curl -v --output image.png http://127.0.0.1:8080/api/v2/photo?cameraId=fullview
+$ curl -v --output image.png http://127.0.0.1:8080/api/v2/photo?cameraId=sample
+```
