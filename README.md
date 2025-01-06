@@ -6,7 +6,7 @@ The SciAps Remote Control API allows clients to query and apply acquisition sett
 | --- | --- |----------------------------------------------|------------------------------------------------------------|---------------------------------------------------------------------------|
 | /api/v2/id | GET | -                                            | InstrumentId                                               | Returns identifying info                                                  |
 | /api/v2/config | GET | -                                            | ZInstrumentConfig or XInstrumentConfig                     | Returns configuration info                                                |
-| /api/v2/status | GET | -                                            | ZInstrumentStatus or ZInstrumentStatus                     | Returns status info                                                       |
+| /api/v2/status | GET | -                                            | ZInstrumentStatus or XInstrumentStatus                     | Returns status info                                                       |
 | /api/v2/wlcalibration | GET | -                                            | ZCalibration                                               | Return calibration coefficients                                           |
 | /api/v2/wlcalibration?mode=[mode] | POST | -                                            | -                                                          | Run a wavelength calibration                                              |
 | /api/v2/energyCal | GET | -                                            | XCalibration                                               | Return calibration coefficients                                           |
