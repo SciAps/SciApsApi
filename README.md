@@ -108,8 +108,8 @@ $ curl -X POST http://192.168.42.129:8080/api/v2/acquisitionParams/user?mode=All
 
 ### /api/v2/test
 This endpoint is used to initiate a test and return spectra and chemistry results.  Individual spectra will be returned
-if **all** is passed as the last segment of the URL.  Only the final, averaged spectra will be returned if **final**
-is passed as the last segment of the URL.  This endpoint requires a mode to be passed which can be obtained from the **apps**
+if **all** is passed as the last segment of the URL.  Only the final, averaged spectra will be returned if **final** is
+passed as the last segment of the URL.  This endpoint requires a mode to be passed which can be obtained from the **apps**
 field of the InstrumentId object. Passing a model name works similar to force base on the analyzer and is optional for most application types.
 Details of the ZTestResult object can be found
 [here](https://github.com/SciAps/SciApsApi/tree/master/api/src/main/java/com/sciaps/ZTestResult.java)
@@ -138,7 +138,7 @@ $ curl -X POST http://192.168.42.129:8080/api/v2/acquisitionParams/factory?mode=
 
 ### /api/v2/acquire
 This endpoint is used to initiate raw spectra acquisition.  Individual spectra will be returned if **all** is passed 
-as the last segment of the URL.  Only the final, averaged spectra will be returned if **final**is passed as the last 
+as the last segment of the URL.  Only the final, averaged spectra will be returned if **final** is passed as the last 
 segment of the URL.  This endpoint requires a mode to be passed which can be obtained from the **apps**
 field of the InstrumentId object.  Details of the
 ZAcquisitionResult object can be found
