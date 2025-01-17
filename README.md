@@ -273,8 +273,8 @@ This endpoint is used to get a high resolution camera image. The endpoint requir
 
 #### Example usage:
 ```
-$ curl -v --output image.jpg http://127.0.0.1:8080/api/v2/photo?cameraId=fullview
-$ curl -v --output image.jpg http://127.0.0.1:8080/api/v2/photo?cameraId=sample
+$ curl -v --output image.jpg http://192.168.42.129:8080/api/v2/photo?cameraId=fullview
+$ curl -v --output image.jpg http://192.168.42.129:8080/api/v2/photo?cameraId=sample
 ```
 
 ### /api/v2/screenshot
@@ -283,7 +283,7 @@ The image is returned in JPEG format.
 
 #### Example usage:
 ```
-$ curl -v --output screenshot.jpg http://127.0.0.1:8080/api/v2/screenshot
+$ curl -v --output screenshot.jpg http://192.168.42.129:8080/api/v2/screenshot
 ```
 
 ## Device Control
@@ -293,5 +293,5 @@ This endpoint is used to perform a graceful shutdown of the analyzer.
 
 #### Example usage:
 ```
-$ curl -X POST http://127.0.0.1:8080/api/v2/shutdown
+$ curl -X POST http://192.168.42.129:8080/api/v2/shutdown
 ```
