@@ -14,4 +14,5 @@ public class InstrumentId {
     public String osVersion;                // OS Release version number
     public List<String> apps;               // Available application modes
     public List<AnalyticalModel> models;    // Available analytical models
+    public List<Library> libraries;         // Available libraries
 }
