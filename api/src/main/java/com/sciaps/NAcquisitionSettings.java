@@ -1,9 +1,8 @@
 package com.sciaps;
 
+import java.util.List;
+
 public class NAcquisitionSettings {
-    public int measurementTime;
-    public boolean initialWhiteRef;
-    public String mineralLibrary;
-    public float confidenceScoreHigh;
-    public float confidenceScoreModerate;
+    public List<NExposureSettings> internalExposureSettings;
+    public List<NExposureSettings> externalExposureSettings;
 }
