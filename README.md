@@ -19,10 +19,15 @@ The SciAps Remote Control API allows clients to query and apply acquisition sett
 | /api/v2/acquisitionParams/user?mode=[mode]               | POST   | -                                                              | -                                                                   | Reset user acquisition settings for the given mode to factory defaults    |
 | /api/v2/acquisitionParams                                | POST   | -                                                              | -                                                                   | Reset acquisition settings to factory defaults                            |
 | /api/v2/test/{spectra}?mode=[mode]&modelName=[modelName] | POST   | ZAcquisitionSettings or<br/>XAcquisitionSettings               | ZTestResult or<br/>XTestResult                                      | Runs a test using the given user acquisition settings                     |
+| /api/v2/testSettings?mode=[mode]                         | GET    | -                                                              | NTestSettings                                                       | Returns test settings for the given mode                                  |
+| /api/v2/testSettings?mode=[mode]                         | PUT    | NTestSettings                                                  | -                                                                   | Applies test settings for the given mode                                  |
+| /api/v2/testSettings?mode=[mode]                         | POST   | -                                                              | -                                                                   | Reset test settings for the given mode to factory defaults                   |
+| /api/v2/test/?mode=[mode]                                | POST   | NTestSettings                                                  | NTestResult                                                         | Runs a test using the given user acquisition settings                     |
 | /api/v2/acquisitionParams/factory?mode=[mode]            | GET    | -                                                              | ZFactoryAcquisitionSettings or<br/>XFactoryAcquisitionSettings      | Returns factory acquisition settings for the given mode                   |
 | /api/v2/acquisitionParams/factory?mode=[mode]            | PUT    | ZFactoryAcquisitionSettings or<br/>XFactoryAcquisitionSettings | -                                                                   | Applies factory acquisition settings for the given mode                   |
 | /api/v2/acquisitionParams/factory?mode=[mode]            | POST   | -                                                              | -                                                                   | Reset factory acquisition settings for the given mode to factory defaults |
 | /api/v2/acquire/{spectra}?mode=[mode]                    | POST   | ZFactoryAcquisitionSettings or<br/>XFactoryAcquisitionSettings | ZAcquisitionResult or<br/>XAcquisitionResult                        | Acquire spectra using the given factory acquisition settings              |
+| /api/v2/acquire                                          | POST   | NAcquisitionSettings                                           | NAcquisitionResult                                                  | Acquire spectra using the given acquisition settings                      |
 | /api/v2/abort                                            | POST   | -                                                              | -                                                                   | Aborts the currently running operation                                    |
 | /api/v2/photo?cameraId=[cameraId]                        | GET    | -                                                              | Byte array                                                          | Takes a high resolution image from the specified camera                   |
 | /api/v2/screenshot                                       | GET    | -                                                              | Byte array                                                          | Returns the camera image currently displayed on the analyzer screen       |
@@ -56,6 +61,15 @@ $ curl http://192.168.42.129:8080/api/v2/id
 {"mode":"Empirical","modelName":"EmpiricalAppTest"},{"mode":"Empirical","modelName":"Coatings-Ag"},{"mode":"Empirical","modelName":"Coatings-Au"},{"mode":"Soil","modelName":"Soil"},
 {"mode":"Mining","modelName":"MiningDeriv"},{"mode":"Mining","modelName":"Mining2Deriv"},{"mode":"Mining","modelName":"MiningAuDeriv"}],"osVersion":"3.10.49-g1be460e",
 "partNumber":"","picVersion":"2.6.0.0","serviceVersion":"ngx-v2.1-1-0-gc29a29f","swVersion":"ngx-v2.2.1-2-131-g59406f679"}
+```
+
+#### Example usage XRF:
+```
+$ curl http://192.168.42.129:8080/api/v2/id
+{"apps":["Minerals","Soil","Agriculture","MiningMl","Mining","SpectrumCollector"],"family":"NIR","homeVersion":"ngl-v3.2-5-g045f557","id":"N350-00010",
+"libraries":[{"mode":"Mining","name":"FactoryLibrary"},{"mode":"Mining","name":"FactoryLibrary Clone"},{"mode":"Minerals","name":"FactoryLibrary"},
+{"mode":"Minerals","name":"testlib"}],"model":"","models":[],"osVersion":"os-firmware-v1.0.3","partNumber":"","picVersion":"1.0.5.5",
+"serviceVersion":"","swVersion":"nir-v1.0-107-gf9048a8"}
 ```
 
 ## LIBS Analyzers
@@ -267,6 +281,90 @@ This endpoint aborts the currently running command
 #### Example usage:
 ```
 $ curl -X POST http://192.168.42.129:8080/api/v2/abort
+```
+
+## NIR Analyzers
+
+### /api/v2/config
+Details of the NInstrumentConfig object can be found
+[here](https://github.com/SciAps/SciApsApi/tree/master/api/src/main/java/com/sciaps/NInstrumentConfig.java)
+
+#### Example usage:
+```
+$ curl http://192.168.42.129:8080/api/v2/config
+{"specHwVersions":["v2.3.1","v3.1.3","v2.3.1"],"specSwVersions":["v2.1.1","v1.2.1","v2.1.1"],"specTypes":["UVVIS","NIR1","NIR2"]}
+```
+
+### /api/v2/status
+Details of the NInstrumentStatus object can be found
+[here](https://github.com/SciAps/SciApsApi/tree/master/api/src/main/java/com/sciaps/NInstrumentStatus.java)
+
+#### Example usage:
+```
+$ curl http://192.168.42.129:8080/api/v2/status
+{"batteryLevel":100.0,"isCharging":true,"isWhiteRefCalNeeded":false,"latitude":0.0,"longitude":0.0,"user":"sciaps","wifiLevel":0,"wifiSSID":""}
+```
+
+## White Reference Calibration
+
+### /api/v2/whiteRefCalibrate
+
+#### Example usage:
+```
+$ curl -X POST http://192.168.42.129:8080/api/v2/whiteRefCalibrate?autoExposure=true
+{"status":"CODE_SUCCESS","abortedByUser":"false","errorCode":0}
+```
+
+## Tests
+These commands relate to running tests which return chemistry information for the sample along with spectra.
+
+### /api/v2/testSettings
+This endpoint is used to retrieve or apply test settings.  This endpoint requires a mode to be passed which can
+be obtained from the **apps** field of the InstrumentId object.  Details of the NTestSettings object can be found
+[here](https://github.com/SciAps/SciApsApi/tree/master/api/src/main/java/com/sciaps/NTestSettings.java)
+
+#### Example usage:
+```
+$ curl --output mining-settings.json http://192.168.42.129:8080/api/v2/testSettings?mode=Mining
+$ curl -X PUT -H "Content-Type: application/json" -d @alloy-user-settings.json http://192.168.42.129:8080/api/v2/testSettings?mode=Mining
+$ curl -X PUT -H "Content-Type: application/json" -d '{"testType":4}' http://192.168.42.129:8080/api/v2/testSettings?mode=Mining
+```
+
+### /api/v2/test
+This endpoint is used to initiate a test and return spectra and match results.  This endpoint requires a mode to be
+passed which can be obtained from the **apps** field of the InstrumentId object.  Details of the NTestResult object
+can be found
+[here](https://github.com/SciAps/SciApsApi/tree/master/api/src/main/java/com/sciaps/NTestResult.java)
+
+#### Example usage:
+```
+# Perform an Mining test with default settings
+$ curl -X POST -H "Content-Type: application/json" -d '{}' --output output.json http://192.168.42.129:8080/api/v2/test?mode=Mining
+# Perform an Mining test with specified settings
+$ curl -X POST -H "Content-Type: application/json" -d @alloy-user-settings.json --output output.json http://192.168.42.129:8080/api/v2/test?mode=Mining
+```
+
+## Raw Spectra Acquisition
+These commands relate to acquiring spectra only.
+
+### /api/v2/acquisitionParams
+This endpoint is used to retrieve or apply acquisition settings, which apply to all modes.  Details of the
+NAcquisitionSettings object can be found
+[here](https://github.com/SciAps/SciApsApi/tree/master/api/src/main/java/com/sciaps/NAcquisitionSettings.java)
+
+#### Example usage:
+```
+$ curl --output settings.json http://192.168.42.129:8080/api/v2/acquisitionParams
+$ curl -X PUT -H "Content-Type: application/json" -d @settings.json http://192.168.42.129:8080/api/v2/acquisitionParams
+```
+
+### /api/v2/acquire
+This endpoint is used to initiate raw spectra acquisition.  Details of the NAcquisitionResult object can be found
+[here](https://github.com/SciAps/SciApsApi/tree/master/api/src/main/java/com/sciaps/NAcquisitionResult.java)
+
+#### Example usage:
+```
+$ curl -X POST -H "Content-Type: application/json" -d @settings.json --output output.json http://192.168.42.129:8080/api/v2/acquire
 ```
 
 ## Camera
