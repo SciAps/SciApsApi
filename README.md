@@ -63,7 +63,7 @@ $ curl http://192.168.42.129:8080/api/v2/id
 "partNumber":"","picVersion":"2.6.0.0","serviceVersion":"ngx-v2.1-1-0-gc29a29f","swVersion":"ngx-v2.2.1-2-131-g59406f679"}
 ```
 
-#### Example usage XRF:
+#### Example usage NIR:
 ```
 $ curl http://192.168.42.129:8080/api/v2/id
 {"apps":["Minerals","Soil","Agriculture","MiningMl","Mining","SpectrumCollector"],"family":"NIR","homeVersion":"ngl-v3.2-5-g045f557","id":"N350-00010",
@@ -316,7 +316,7 @@ $ curl -X POST http://192.168.42.129:8080/api/v2/whiteRefCalibrate?autoExposure=
 ```
 
 ## Tests
-These commands relate to running tests which return chemistry information for the sample along with spectra.
+These commands relate to running tests which return mode-specific data, including mineral matches and scalar values for the sample, along with spectra.
 
 ### /api/v2/testSettings
 This endpoint is used to retrieve or apply test settings.  This endpoint requires a mode to be passed which can
@@ -326,8 +326,8 @@ be obtained from the **apps** field of the InstrumentId object.  Details of the 
 #### Example usage:
 ```
 $ curl --output mining-settings.json http://192.168.42.129:8080/api/v2/testSettings?mode=Mining
-$ curl -X PUT -H "Content-Type: application/json" -d @alloy-user-settings.json http://192.168.42.129:8080/api/v2/testSettings?mode=Mining
-$ curl -X PUT -H "Content-Type: application/json" -d '{"testType":4}' http://192.168.42.129:8080/api/v2/testSettings?mode=Mining
+$ curl -X PUT -H "Content-Type: application/json" -d @minig-settings.json http://192.168.42.129:8080/api/v2/testSettings?mode=Mining
+$ curl -X PUT -H "Content-Type: application/json" -d '{"mineralLibrary":"custom"}' http://192.168.42.129:8080/api/v2/testSettings?mode=Mining
 ```
 
 ### /api/v2/test
