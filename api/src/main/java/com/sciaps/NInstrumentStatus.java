@@ -2,7 +2,7 @@ package com.sciaps;
 
 public class NInstrumentStatus {
     public float batteryLevel;              // Battery charge level in percent
-    public boolean isCharging;              // True is battery charged is plugged in
+    public boolean isCharging;              // True is battery charger is plugged in
     public String user;                     // Current user
     public String wifiSSID;                 // Wifi SSID
     public int wifiLevel;                   // Wifi signal strength 0-3
