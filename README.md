@@ -309,6 +309,10 @@ $ curl http://192.168.42.129:8080/api/v2/status
 
 ### /api/v2/whiteRefCalibrate
 
+This endpoint causes a White Reference calibration to be performed.  The `autoExposure` parameter controls whether
+the exposure settings are recalculated and saved in addition to the external white reference scaling values.  `AutoExposure`
+is enabled by default.
+
 #### Example usage:
 ```
 $ curl -X POST http://192.168.42.129:8080/api/v2/whiteRefCalibrate?autoExposure=true
@@ -326,7 +330,7 @@ be obtained from the **apps** field of the InstrumentId object.  Details of the 
 #### Example usage:
 ```
 $ curl --output mining-settings.json http://192.168.42.129:8080/api/v2/testSettings?mode=Mining
-$ curl -X PUT -H "Content-Type: application/json" -d @minig-settings.json http://192.168.42.129:8080/api/v2/testSettings?mode=Mining
+$ curl -X PUT -H "Content-Type: application/json" -d @mining-settings.json http://192.168.42.129:8080/api/v2/testSettings?mode=Mining
 $ curl -X PUT -H "Content-Type: application/json" -d '{"mineralLibrary":"custom"}' http://192.168.42.129:8080/api/v2/testSettings?mode=Mining
 ```
 
@@ -341,7 +345,7 @@ can be found
 # Perform an Mining test with default settings
 $ curl -X POST -H "Content-Type: application/json" -d '{}' --output output.json http://192.168.42.129:8080/api/v2/test?mode=Mining
 # Perform an Mining test with specified settings
-$ curl -X POST -H "Content-Type: application/json" -d @alloy-user-settings.json --output output.json http://192.168.42.129:8080/api/v2/test?mode=Mining
+$ curl -X POST -H "Content-Type: application/json" -d @mining-settings.json --output output.json http://192.168.42.129:8080/api/v2/test?mode=Mining
 ```
 
 ## Raw Spectra Acquisition

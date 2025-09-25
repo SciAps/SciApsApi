@@ -8,5 +8,5 @@ public class NInstrumentStatus {
     public int wifiLevel;                   // Wifi signal strength 0-3
     public double latitude;                 // Current latitude of device
     public double longitude;                // Current longitude of device
-    public boolean isWhiteRefCalNeeded;     // is energy calibration required
+    public boolean isWhiteRefCalNeeded;     // is White Ref Calibration required
 }
