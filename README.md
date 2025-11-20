@@ -308,7 +308,7 @@ $ curl -X PUT -H "Content-Type: application/json" -d @settings.json http://192.1
 
 #### /api/v2/acquire
 This endpoint is used to initiate raw spectra acquisition.  Individual spectra will be returned if **all** is passed
-as the last segment of the URL.  Only the final spectra will be returned if **final**is passed as the last
+as the last segment of the URL.  Only the final spectra will be returned if **final** is passed as the last
 segment of the URL.  This endpoint requires a mode to be passed which can be obtained from the **apps**
 field of the InstrumentId object.
 Optionally, the spectraFormat parameter can be passed to specify how the spectra data is returned.  Passing **csv** will populate 
