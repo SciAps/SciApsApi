@@ -172,9 +172,9 @@ This endpoint is used to initiate a test and return spectra and chemistry result
 if **all** is passed as the last segment of the URL.  Only the final, averaged spectra will be returned if **final** is
 passed as the last segment of the URL.  This endpoint requires a mode to be passed which can be obtained from the **apps**
 field of the InstrumentId object. Passing a model name works similar to force base on the analyzer and is optional for most application types.
-Optionally, the spectraFormat parameter can be passed to force either **raw** or **interpolated** spectra. The **raw** option will return pixel 
-intensity values without the wavelength calibration applied (this is the default behavior), where as **interpolated** will return arrays of X- 
-and Y-values, a set of which constitutes a fully processed spectrum where ***X*** is wavelength in nanometers and ***Y*** is intensity (total counts).
+Optionally, the spectraFormat parameter can be passed to specify how the spectra data is returned.  Passing **interpolated** will populate 
+the `spectraInterpolated` field of the ZTestResult object whereas passing **raw** will populate the `spectra` field instead (this is the 
+default behavior).
 Details of the ZTestResult object can be found
 [here.](https://github.com/SciAps/SciApsApi/tree/master/api/src/main/java/com/sciaps/ZTestResult.java)
 
@@ -205,9 +205,9 @@ This endpoint is used to initiate raw spectra acquisition.  Individual spectra w
 as the last segment of the URL.  Only the final, averaged spectra will be returned if **final** is passed as the last
 segment of the URL.  This endpoint requires a mode to be passed which can be obtained from the **apps** field of the 
 InstrumentId object.
-Optionally, the spectraFormat parameter can be passed to force either **raw** or **interpolated** spectra. The **raw** option will return pixel 
-intensity values without the wavelength calibration applied (this is the default behavior), where as **interpolated** will return arrays of X- 
-and Y-values, a set of which constitutes a fully processed spectrum where ***X*** is wavelength in nanometers and ***Y*** is intensity (total counts).
+Optionally, the spectraFormat parameter can be passed to specify how the spectra data is returned.  Passing **interpolated** will populate 
+the `spectraInterpolated` field of the ZTestResult object whereas passing **raw** will populate the `spectra` field instead (this is the 
+default behavior).
 ZAcquisitionResult object can be found
 [here.](https://github.com/SciAps/SciApsApi/tree/master/api/src/main/java/com/sciaps/ZAcquisitionResult.java)
 
@@ -275,10 +275,9 @@ This endpoint is used to initiate a test and return spectra and chemistry result
 if **all** is passed as the last segment of the URL.  Only the final spectra will be returned if **final**
 is passed as the last segment of the URL.  This endpoint requires a mode to be passed which can be obtained from the **apps**
 field of the InstrumentId object.  
-Optionally, the spectraFormat parameter can be passed to force either **mca** or **csv** spectra. The **mca** option will return channel 
-intensity values without the energy calibration applied (this is the default behavior), where as **interpolated** will return arrays of X- 
-and Y-values, a set of which constitutes a fully processed spectrum where *X* is energy in kiloelectron volts and *Y* is intensity (counts 
-per second).
+Optionally, the spectraFormat parameter can be passed to specify how the spectra data is returned.  Passing **csv** will populate 
+the `x` and `y` fields of the [XSpectrum object](https://github.com/SciAps/SciApsApi/tree/master/api/src/main/java/com/sciaps/XSpectrum.java) 
+whereas passing **mca** will populate the `data` field instead (this is the default behavior).
 Details of the XTestResult object can be found
 [here.](https://github.com/SciAps/SciApsApi/tree/master/api/src/main/java/com/sciaps/XTestResult.java)
 
@@ -312,10 +311,9 @@ This endpoint is used to initiate raw spectra acquisition.  Individual spectra w
 as the last segment of the URL.  Only the final spectra will be returned if **final**is passed as the last
 segment of the URL.  This endpoint requires a mode to be passed which can be obtained from the **apps**
 field of the InstrumentId object.
-Optionally, the spectraFormat parameter can be passed to force either **mca** or **csv** spectra. The **mca** option will return channel 
-intensity values without the energy calibration applied (this is the default behavior), where as **interpolated** will return arrays of X- 
-and Y-values, a set of which constitutes a fully processed spectrum where *X* is energy in kiloelectron volts and *Y* is intensity (counts 
-per second).
+Optionally, the spectraFormat parameter can be passed to specify how the spectra data is returned.  Passing **csv** will populate 
+the `x` and `y` fields of the [XSpectrum object](https://github.com/SciAps/SciApsApi/tree/master/api/src/main/java/com/sciaps/XSpectrum.java) 
+whereas passing **mca** will populate the `data` field instead (this is the default behavior).
 Details of the XAcquisitionResult object can be found
 [here.](https://github.com/SciAps/SciApsApi/tree/master/api/src/main/java/com/sciaps/XAcquisitionResult.java)
 
