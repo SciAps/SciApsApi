@@ -1,7 +1,5 @@
 package com.sciaps;
 
-import java.util.List;
-
 public class ZInstrumentConfig {
     public String spectrometers;      // Installed spectrometers
     public boolean isArgonCapable;          // is device equipped with argon tank
