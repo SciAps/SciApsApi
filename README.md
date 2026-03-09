@@ -219,6 +219,8 @@ Example usage:
 $ curl -X POST -H "Content-Type: application/json" -d @settings.json --output output.json http://192.168.42.129:8080/api/v2/acquire/all?mode=Alloy
 ```
 
+### Argon Purge
+
 #### /api/v2/purge/start
 
 This endpoint is used to start argon purge, which can be used to flush the argon line 
