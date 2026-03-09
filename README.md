@@ -32,6 +32,9 @@ The SciAps Remote Control API allows clients to query and apply acquisition sett
 | /api/v2/acquisitionParams/factory?mode=[mode]            						  | POST   | -                                                              | -                                                                   | Reset factory acquisition settings for the given mode to factory defaults |
 | /api/v2/acquire/{spectra}?mode=[mode]&spectraFormat=[format]                    | POST   | ZFactoryAcquisitionSettings or<br/>XFactoryAcquisitionSettings | ZAcquisitionResult or<br/>XAcquisitionResult                        | Acquire spectra using the given factory acquisition settings              |
 | /api/v2/acquire                                          						  | POST   | NAcquisitionSettings                                           | NAcquisitionResult                                                  | Acquire spectra using the given acquisition settings                      |
+| /api/v2/purge/start                                          			         | POST   |                                                                |                                                                     | Start Argon purge                                                         |
+| /api/v2/purge/stop                                          				         | POST   |                                                                |                                                                     | Stop Argon purge                                                          |
+| /api/v2/purge/status                                          			       | GET    |                                                                |                                                                     | Get Argon purge status                                                    |
 
 ## All Analyzers
 ### Analyzer Information
@@ -216,6 +219,36 @@ Example usage:
 $ curl -X POST -H "Content-Type: application/json" -d @settings.json --output output.json http://192.168.42.129:8080/api/v2/acquire/all?mode=Alloy
 ```
 
+#### /api/v2/purge/start
+
+This endpoint is used to start argon purge. This is used either to flush the argon line at power on,
+or to empty a cartridge for safe removal.
+Example usage:
+
+```
+$ curl -X POST http://192.168.42.129:8080/api/v2/purge/start
+```
+
+#### /api/v2/purge/stop
+
+This endpoint is used to stop argon purge.
+Example usage:
+
+```
+$ curl -X POST http://192.168.42.129:8080/api/v2/purge/stop
+```
+
+#### /api/v2/purge/status
+
+This endpoint is used to get the current status of argon purge.
+ArgonPurgeStatus object can be found
+[here.](https://github.com/SciAps/SciApsApi/tree/master/api/src/main/java/com/sciaps/ArgonPurgeStatus.java)
+Example usage:
+
+```
+$ curl http://192.168.42.129:8080/api/v2/purge/status
+{"inProgress": false, "elapsedTimeMs": 0, "lastPressurePsi": 12.606042}
+```
 
 ## XRF Analyzers
 
