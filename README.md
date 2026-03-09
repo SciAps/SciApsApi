@@ -221,7 +221,7 @@ $ curl -X POST -H "Content-Type: application/json" -d @settings.json --output ou
 
 #### /api/v2/purge/start
 
-This endpoint is used to start argon purge. This is used either to flush the argon line at power on,
+This endpoint is used to start argon purge, which can be used to flush the argon line 
 or to empty a cartridge for safe removal.
 Example usage:
 
