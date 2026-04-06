@@ -249,7 +249,7 @@ Example usage:
 
 ```
 $ curl http://192.168.42.129:8080/api/v2/purge/status
-{"inProgress": false, "elapsedTimeMs": 0, "lastPressurePsi": 12.606042}
+{"inProgress": false, "elapsedTimeSec": 0, "lastPressurePsi": 12.606042}
 ```
 
 ## XRF Analyzers
