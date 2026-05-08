@@ -12,6 +12,7 @@ public class InstrumentId {
     public String serviceVersion;           // Analyzer Service version number
     public String picVersion;               // PIC Firmware version number
     public String osVersion;                // OS Release version number
+    public String somRevision;              // SOM revision number
     public List<String> apps;               // Available application modes
     public List<AnalyticalModel> models;    // Available analytical models
     public List<Library> libraries;         // Available libraries
