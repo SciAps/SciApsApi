@@ -2,49 +2,49 @@
 
 The SciAps Remote Control API allows clients to query and apply acquisition settings, and initiate calibrations, tests and spectrum acquisitions.
 
-| URL                                                                             | METHOD | BODY                                                           | RESPONSE                                                            | DESCRIPTION                                                               |
-|---------------------------------------------------------------------------------|--------|----------------------------------------------------------------|---------------------------------------------------------------------|---------------------------------------------------------------------------|
-| /api/v2/id                                                                      | GET    | -                                                              | InstrumentId                                                        | Returns identifying info                                                  |
-| /api/v2/photo?cameraId=[cameraId]                                               | GET    | -                                                              | Byte array                                                          | Takes a high resolution image from the specified camera                   |
-| /api/v2/screenshot                                                              | GET    | -                                                              | Byte array                                                          | Returns the camera image currently displayed on the analyzer screen       |
-| /api/v2/abort                                                                   | POST   | -                                                              | -                                                                   | Aborts the currently running operation                                    |
-| /api/v2/shutdown                                                                | POST   | -                                                              | -                                                                   | Performs a graceful shutdown of the analyzer                              |
-| /api/v2/config                                                                  | GET    | -                                                              | ZInstrumentConfig or<br/>XInstrumentConfig or<br/>NInstrumentConfig | Returns configuration info                                                |
-| /api/v2/status                                                                  | GET    | -                                                              | ZInstrumentStatus or<br/>XInstrumentStatus or<br/>NInstrumentStatus | Returns status info                                                       |
-| /api/v2/wlcalibration                                                           | GET    | -                                                              | ZCalibration                                                        | Return calibration coefficients                                           |
-| /api/v2/wlcalibration?mode=[mode]                                               | POST   | -                                                              | -                                                                   | Run a wavelength calibration                                              |
-| /api/v2/energyCal                                                               | GET    | -                                                              | XCalibration                                                        | Return calibration coefficients                                           |
-| /api/v2/energyCal                                                               | POST   | -                                                              | -                                                                   | Run an energy calibration                                                 |
-| /api/v2/whiteRefCalibrate?autoExposure=[true/false]                             | POST   | -                                                              | -                                                                   |                                                                           |
-| /api/v2/acquisitionParams/user?mode=[mode]                                      | GET    | -                                                              | ZAcquisitionSettings or<br/>XAcquisitionSettings                    | Returns user acquisition settings for the given mode                      |
-| /api/v2/acquisitionParams                                                       | GET    | -                                                              | NAcquisitionSettings                                                |                                                                           |
-| /api/v2/acquisitionParams/user?mode=[mode]                                      | PUT    | ZAcquisitionSettings or<br/>XAcquisitionSettings               | -                                                                   | Applies user acquisition settings for the given mode                      |
-| /api/v2/acquisitionParams                                                       | PUT    | NAcquisitionSettings                                           | -                                                                   |                                                                           |
-| /api/v2/acquisitionParams/user?mode=[mode]                                      | POST   | -                                                              | -                                                                   | Reset user acquisition settings for the given mode to factory defaults    |
-| /api/v2/acquisitionParams                                                       | POST   | -                                                              | -                                                                   | Reset acquisition settings to factory defaults                            |
-| /api/v2/test/{spectra}?mode=[mode]&modelName=[modelName]&spectraFormat=[format] | POST   | ZAcquisitionSettings or<br/>XAcquisitionSettings               | ZTestResult or<br/>XTestResult                                      | Runs a test using the given user acquisition settings                     |
-| /api/v2/testSettings?mode=[mode]                         						  | GET    | -                                                              | NTestSettings                                                       | Returns test settings for the given mode                                  |
-| /api/v2/testSettings?mode=[mode]                         						  | PUT    | NTestSettings                                                  | -                                                                   | Applies test settings for the given mode                                  |
-| /api/v2/testSettings?mode=[mode]                         						  | POST   | -                                                              | -                                                                   | Reset test settings for the given mode to factory defaults                |
-| /api/v2/test/?mode=[mode]                                						  | POST   | NTestSettings                                                  | NTestResult                                                         | Runs a test using the given user acquisition settings                     |
-| /api/v2/acquisitionParams/factory?mode=[mode]            						  | GET    | -                                                              | ZFactoryAcquisitionSettings or<br/>XFactoryAcquisitionSettings      | Returns factory acquisition settings for the given mode                   |
-| /api/v2/acquisitionParams/factory?mode=[mode]            						  | PUT    | ZFactoryAcquisitionSettings or<br/>XFactoryAcquisitionSettings | -                                                                   | Applies factory acquisition settings for the given mode                   |
-| /api/v2/acquisitionParams/factory?mode=[mode]            						  | POST   | -                                                              | -                                                                   | Reset factory acquisition settings for the given mode to factory defaults |
-| /api/v2/acquire/{spectra}?mode=[mode]&spectraFormat=[format]                    | POST   | ZFactoryAcquisitionSettings or<br/>XFactoryAcquisitionSettings | ZAcquisitionResult or<br/>XAcquisitionResult                        | Acquire spectra using the given factory acquisition settings              |
-| /api/v2/acquire                                          						  | POST   | NAcquisitionSettings                                           | NAcquisitionResult                                                  | Acquire spectra using the given acquisition settings                      |
-| /api/v2/purge/start                                          			         | POST   |                                                                | -                                                                   | Start Argon purge                                                         |
-| /api/v2/purge/stop                                          				         | POST   |                                                                | -                                                                   | Stop Argon purge                                                          |
-| /api/v2/purge/status                                          			       | GET    |                                                                | ArgonPurgeStatus                                                                    | Get Argon purge status                                                    |
+| URL                               | METHOD | PARAMS                                                           | BODY                                                               | RESPONSE                                                                    | DESCRIPTION                                                               |
+|-----------------------------------|--------|------------------------------------------------------------------|--------------------------------------------------------------------|-----------------------------------------------------------------------------|---------------------------------------------------------------------------|
+| /api/v2/id                        | GET    | -                                                                | -                                                                  | InstrumentId                                                                | Returns identifying info                                                  |
+| /api/v2/photo                     | GET    | cameraId=[cameraId]                                              | -                                                                  | Byte array                                                                  | Takes a high resolution image from the specified camera                   |
+| /api/v2/screenshot                | GET    | -                                                                | -                                                                  | Byte array                                                                  | Returns the camera image currently displayed on the analyzer screen       |
+| /api/v2/abort                     | POST   | -                                                                | -                                                                  | -                                                                           | Aborts the currently running operation                                    |
+| /api/v2/shutdown                  | POST   | -                                                                | -                                                                  | -                                                                           | Performs a graceful shutdown of the analyzer                              |
+| /api/v2/config                    | GET    | -                                                                | -                                                                  | ZInstrumentConfig<br/>or<br/>XInstrumentConfig<br/>or<br/>NInstrumentConfig | Returns configuration info                                                |
+| /api/v2/status                    | GET    | -                                                                | -                                                                  | ZInstrumentStatus<br/>or<br/>XInstrumentStatus<br/>or<br/>NInstrumentStatus | Returns status info                                                       |
+| /api/v2/wlcalibration             | GET    | -                                                                | -                                                                  | ZCalibration                                                                | Return calibration coefficients                                           |
+| /api/v2/wlcalibration             | POST   | mode=[mode]                                                      | -                                                                  | -                                                                           | Run a wavelength calibration                                              |
+| /api/v2/energyCal                 | GET    | -                                                                | -                                                                  | XCalibration                                                                | Return calibration coefficients                                           |
+| /api/v2/energyCal                 | POST   | -                                                                | -                                                                  | -                                                                           | Run an energy calibration                                                 |
+| /api/v2/whiteRefCalibrate         | POST   | autoExposure=[true/false]                                        | -                                                                  | -                                                                           |                                                                           |
+| /api/v2/acquisitionParams/user    | GET    | mode=[mode]                                                      | -                                                                  | ZAcquisitionSettings<br/>or<br/>XAcquisitionSettings                        | Returns user acquisition settings for the given mode                      |
+| /api/v2/acquisitionParams         | GET    | -                                                                | -                                                                  | NAcquisitionSettings                                                        |                                                                           |
+| /api/v2/acquisitionParams/user    | PUT    | mode=[mode]                                                      | ZAcquisitionSettings<br/>or<br/>XAcquisitionSettings               | -                                                                           | Applies user acquisition settings for the given mode                      |
+| /api/v2/acquisitionParams         | PUT    | -                                                                | NAcquisitionSettings                                               | -                                                                           |                                                                           |
+| /api/v2/acquisitionParams/user    | POST   | mode=[mode]                                                      | -                                                                  | -                                                                           | Reset user acquisition settings for the given mode to factory defaults    |
+| /api/v2/acquisitionParams         | POST   | -                                                                | -                                                                  | -                                                                           | Reset acquisition settings to factory defaults                            |
+| /api/v2/test/{spectra}            | POST   | mode=[mode]<br/>modelName=[modelName]<br/>spectraFormat=[format] | ZAcquisitionSettings<br/>or<br/>XAcquisitionSettings               | ZTestResult<br/>or<br/>XTestResult                                          | Runs a test using the given user acquisition settings                     |
+| /api/v2/testSettings              | GET    | mode=[mode]                                                      | -                                                                  | NTestSettings                                                               | Returns test settings for the given mode                                  |
+| /api/v2/testSettings              | PUT    | mode=[mode]                                                      | NTestSettings                                                      | -                                                                           | Applies test settings for the given mode                                  |
+| /api/v2/testSettings              | POST   | mode=[mode]                                                      | -                                                                  | -                                                                           | Reset test settings for the given mode to factory defaults                |
+| /api/v2/test/                     | POST   | mode=[mode]                                                      | NTestSettings                                                      | NTestResult                                                                 | Runs a test using the given user acquisition settings                     |
+| /api/v2/acquisitionParams/factory | GET    | mode=[mode]                                                      | -                                                                  | ZFactoryAcquisitionSettings<br/>or<br/>XFactoryAcquisitionSettings          | Returns factory acquisition settings for the given mode                   |
+| /api/v2/acquisitionParams/factory | PUT    | mode=[mode]                                                      | ZFactoryAcquisitionSettings<br/>or<br/>XFactoryAcquisitionSettings | -                                                                           | Applies factory acquisition settings for the given mode                   |
+| /api/v2/acquisitionParams/factory | POST   | mode=[mode]                                                      | -                                                                  | -                                                                           | Reset factory acquisition settings for the given mode to factory defaults |
+| /api/v2/acquire/{spectra}         | POST   | mode=[mode]<br/>spectraFormat=[format]                           | ZFactoryAcquisitionSettings<br/>or<br/>XFactoryAcquisitionSettings | ZAcquisitionResult<br/>or<br/>XAcquisitionResult                            | Acquire spectra using the given factory acquisition settings              |
+| /api/v2/acquire                   | POST   | -                                                                | NAcquisitionSettings                                               | NAcquisitionResult                                                          | Acquire spectra using the given acquisition settings                      |
+| /api/v2/purge/start               | POST   | -                                                                | -                                                                  | -                                                                           | Start Argon purge                                                         |
+| /api/v2/purge/stop                | POST   | -                                                                | -                                                                  | -                                                                           | Stop Argon purge                                                          |
+| /api/v2/purge/status              | GET    | -                                                                | -                                                                  | ArgonPurgeStatus                                                            | Get Argon purge status                                                    |
 
 ## All Analyzers
 ### Analyzer Information
-These commands return identifying information required for further communications with the analyzer as well as 
+These commands return identifying information required for further communications with the analyzer as well as
 configuration and current status.
 
 #### /api/v2/id
 Clients should query the **id** endpoint to determine the device family which identifies the analyzer as XRF or LIBS.
-Also, the list of licensed applications id returned, which define the valid values for the mode parameter of the other 
-endpoints.  Details of the InstrumentId object can be found 
+Also, the list of licensed applications id returned, which define the valid values for the mode parameter of the other
+endpoints.  Details of the InstrumentId object can be found
 [here.](https://github.com/SciAps/SciApsApi/tree/master/api/src/main/java/com/sciaps/InstrumentId.java)
 
 Example usage LIBS:
@@ -89,7 +89,7 @@ $ curl -v --output image.jpg http://192.168.42.129:8080/api/v2/photo?cameraId=sa
 ```
 
 #### /api/v2/screenshot
-This endpoint is used to get a copy of the camera image currently displayed on the analyzer screen. 
+This endpoint is used to get a copy of the camera image currently displayed on the analyzer screen.
 The image is returned in JPEG format.
 
 Example usage:
@@ -119,7 +119,7 @@ $ curl -X POST http://192.168.42.129:8080/api/v2/shutdown
 ## LIBS Analyzers
 
 #### /api/v2/config
-Details of the ZInstrumentConfig object can be found 
+Details of the ZInstrumentConfig object can be found
 [here.](https://github.com/SciAps/SciApsApi/tree/master/api/src/main/java/com/sciaps/ZInstrumentConfig.java)
 
 Example usage:
@@ -129,7 +129,7 @@ $ curl http://192.168.42.129:8080/api/v2/config
 ```
 
 #### /api/v2/status
-Details of the ZInstrumentStatus object can be found 
+Details of the ZInstrumentStatus object can be found
 [here.](https://github.com/SciAps/SciApsApi/tree/master/api/src/main/java/com/sciaps/ZInstrumentStatus.java)
 
 Example usage:
@@ -142,7 +142,7 @@ $ curl http://192.168.42.129:8080/api/v2/status
 These commands return the current calibration coefficients and recalculates them.
 
 #### /api/v2/wlcalibration
-Details of the ZCalibration object can be found 
+Details of the ZCalibration object can be found
 [here.](https://github.com/SciAps/SciApsApi/tree/master/api/src/main/java/com/sciaps/ZCalibration.java)
 
 Example usage:
@@ -154,7 +154,7 @@ $ curl -X POST http://192.168.42.129:8080/api/v2/wlcalibration?mode=Alloy
 ```
 
 ### Tests
-These commands relate to running tests which return chemistry information for the sample along with spectra. 
+These commands relate to running tests which return chemistry information for the sample along with spectra.
 
 #### /api/v2/acquisitionParams/user
 This endpoint is used to retrieve, apply or reset user acquisition settings.  User acquisition settings are a subset
@@ -175,8 +175,8 @@ This endpoint is used to initiate a test and return spectra and chemistry result
 if **all** is passed as the last segment of the URL.  Only the final, averaged spectra will be returned if **final** is
 passed as the last segment of the URL.  This endpoint requires a mode to be passed which can be obtained from the **apps**
 field of the InstrumentId object. Passing a model name works similar to force base on the analyzer and is optional for most application types.
-Optionally, the spectraFormat parameter can be passed to specify how the spectra data is returned.  Passing **interpolated** will populate 
-the `spectraInterpolated` field of the ZTestResult object whereas passing **raw** will populate the `spectra` field instead (this is the 
+Optionally, the spectraFormat parameter can be passed to specify how the spectra data is returned.  Passing **interpolated** will populate
+the `spectraInterpolated` field of the ZTestResult object whereas passing **raw** will populate the `spectra` field instead (this is the
 default behavior).
 Details of the ZTestResult object can be found
 [here.](https://github.com/SciAps/SciApsApi/tree/master/api/src/main/java/com/sciaps/ZTestResult.java)
@@ -191,9 +191,9 @@ $ curl -X POST -H "Content-Type: application/json" -d '{}' --output output.json 
 These commands relate to acquiring spectra only.
 
 #### /api/v2/acquisitionParams/factory
-This endpoint is used to retrieve, apply or reset factory acquisition settings.  This endpoint requires a mode to be 
-passed which can be obtained from the **apps** field of the InstrumentId object.  Details of the 
-ZFactoryAcquisitionSettings object can be found 
+This endpoint is used to retrieve, apply or reset factory acquisition settings.  This endpoint requires a mode to be
+passed which can be obtained from the **apps** field of the InstrumentId object.  Details of the
+ZFactoryAcquisitionSettings object can be found
 [here.](https://github.com/SciAps/SciApsApi/tree/master/api/src/main/java/com/sciaps/ZFactoryAcquisitionSettings.java)
 
 Example usage:
@@ -206,10 +206,10 @@ $ curl -X POST http://192.168.42.129:8080/api/v2/acquisitionParams/factory?mode=
 #### /api/v2/acquire
 This endpoint is used to initiate raw spectra acquisition.  Individual spectra will be returned if **all** is passed
 as the last segment of the URL.  Only the final, averaged spectra will be returned if **final** is passed as the last
-segment of the URL.  This endpoint requires a mode to be passed which can be obtained from the **apps** field of the 
+segment of the URL.  This endpoint requires a mode to be passed which can be obtained from the **apps** field of the
 InstrumentId object.
-Optionally, the spectraFormat parameter can be passed to specify how the spectra data is returned.  Passing **interpolated** will populate 
-the `spectraInterpolated` field of the ZTestResult object whereas passing **raw** will populate the `spectra` field instead (this is the 
+Optionally, the spectraFormat parameter can be passed to specify how the spectra data is returned.  Passing **interpolated** will populate
+the `spectraInterpolated` field of the ZTestResult object whereas passing **raw** will populate the `spectra` field instead (this is the
 default behavior).
 ZAcquisitionResult object can be found
 [here.](https://github.com/SciAps/SciApsApi/tree/master/api/src/main/java/com/sciaps/ZAcquisitionResult.java)
@@ -223,7 +223,7 @@ $ curl -X POST -H "Content-Type: application/json" -d @settings.json --output ou
 
 #### /api/v2/purge/start
 
-This endpoint is used to start argon purge, which can be used to flush the argon line 
+This endpoint is used to start argon purge, which can be used to flush the argon line
 or to empty a cartridge for safe removal.
 Example usage:
 
@@ -265,7 +265,7 @@ $ curl http://192.168.42.129:8080/api/v2/config
 ```
 
 #### /api/v2/status
-Details of the XInstrumentStatus object can be found 
+Details of the XInstrumentStatus object can be found
 [here.](https://github.com/SciAps/SciApsApi/tree/master/api/src/main/java/com/sciaps/XInstrumentStatus.java)
 
 Example usage:
@@ -278,7 +278,7 @@ $ curl http://192.168.42.129:8080/api/v2/status
 These commands return the current calibration coefficients and recalculates them.
 
 #### /api/v2/energyCal
-Details of the XCalibration object can be found 
+Details of the XCalibration object can be found
 [here.](https://github.com/SciAps/SciApsApi/tree/master/api/src/main/java/com/sciaps/XCalibration.java)
 
 Example usage:
@@ -310,8 +310,8 @@ This endpoint is used to initiate a test and return spectra and chemistry result
 if **all** is passed as the last segment of the URL.  Only the final spectra will be returned if **final**
 is passed as the last segment of the URL.  This endpoint requires a mode to be passed which can be obtained from the **apps**
 field of the InstrumentId object.  
-Optionally, the spectraFormat parameter can be passed to specify how the spectra data is returned.  Passing **csv** will populate 
-the `x` and `y` fields of the [XSpectrum object](https://github.com/SciAps/SciApsApi/tree/master/api/src/main/java/com/sciaps/XSpectrum.java) 
+Optionally, the spectraFormat parameter can be passed to specify how the spectra data is returned.  Passing **csv** will populate
+the `x` and `y` fields of the [XSpectrum object](https://github.com/SciAps/SciApsApi/tree/master/api/src/main/java/com/sciaps/XSpectrum.java)
 whereas passing **mca** will populate the `data` field instead (this is the default behavior).
 Details of the XTestResult object can be found
 [here.](https://github.com/SciAps/SciApsApi/tree/master/api/src/main/java/com/sciaps/XTestResult.java)
@@ -346,8 +346,8 @@ This endpoint is used to initiate raw spectra acquisition.  Individual spectra w
 as the last segment of the URL.  Only the final spectra will be returned if **final** is passed as the last
 segment of the URL.  This endpoint requires a mode to be passed which can be obtained from the **apps**
 field of the InstrumentId object.
-Optionally, the spectraFormat parameter can be passed to specify how the spectra data is returned.  Passing **csv** will populate 
-the `x` and `y` fields of the [XSpectrum object](https://github.com/SciAps/SciApsApi/tree/master/api/src/main/java/com/sciaps/XSpectrum.java) 
+Optionally, the spectraFormat parameter can be passed to specify how the spectra data is returned.  Passing **csv** will populate
+the `x` and `y` fields of the [XSpectrum object](https://github.com/SciAps/SciApsApi/tree/master/api/src/main/java/com/sciaps/XSpectrum.java)
 whereas passing **mca** will populate the `data` field instead (this is the default behavior).
 Details of the XAcquisitionResult object can be found
 [here.](https://github.com/SciAps/SciApsApi/tree/master/api/src/main/java/com/sciaps/XAcquisitionResult.java)
