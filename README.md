@@ -2,6 +2,9 @@
 
 The SciAps Remote Control API allows clients to query and apply acquisition settings, and initiate calibrations, tests and spectrum acquisitions.
 
+> **NOTE:** In software v4.0+ for all SciAps products, the SciAps Remote Control API is now served over HTTPS. Plaintext HTTP is still available in
+> v4.0, but is deprecated. On February 1, 2027, HTTP support ends completely. For more information, contact [api-support@sciaps.com](mailto:api-support@sciaps.com).
+
 | URL                               | METHOD | PARAMS                                                           | BODY                                                               | RESPONSE                                                                    | DESCRIPTION                                                               |
 |-----------------------------------|--------|------------------------------------------------------------------|--------------------------------------------------------------------|-----------------------------------------------------------------------------|---------------------------------------------------------------------------|
 | /api/v2/id                        | GET    | -                                                                | -                                                                  | InstrumentId                                                                | Returns identifying info                                                  |
